@@ -10,34 +10,53 @@
  *
  *------------------------------------------------------------------------*/
 
+/*------------------------------------------------------------------------
+ *
+ *  Modified: FC 동작 제어 최적화
+ *
+ *------------------------------------------------------------------------*/
+
 /*-------------------------------------------------------------------
  *  Module: fully_connected
  *------------------------------------------------------------------*/
 
- module fully_connected #(parameter INPUT_NUM = 48, OUTPUT_NUM = 10, DATA_BITS = 8) (
+module fully_connected #(parameter INPUT_NUM = 48, OUTPUT_NUM = 10, DATA_BITS = 8) (
    input clk,
    input rst_n,
    input valid_in,
+
    input signed [11:0] data_in_1, data_in_2, data_in_3,
+
    output reg [11:0] data_out,
    output reg valid_out_fc,
+
    input [0:3839] w_fc,
    input [0:79] b_fc
  );
 
  localparam INPUT_WIDTH = 16;
- localparam INPUT_NUM_DATA_BITS = 5;
+ // localparam INPUT_NUM_DATA_BITS = 5;
+ 
+ // 새로운 제어 변수 정의 state 변수 2비트로 변경
+ localparam [1:0] ST_COLLECT = 2'd0;
+ localparam [1:0] ST_OUTPUT = 2'd1;
+ localparam [1:0] ST_DONE = 2'd2;
 
- reg state;
- reg [INPUT_WIDTH - 1:0] buf_idx;
+ reg [1:0] state;
+ 
+ // 총 48개의 features 및 0~9의 index 존재
+ reg [3:0] buf_idx;
  reg [3:0] out_idx;
+ 
  reg signed [13:0] buffer [0:INPUT_NUM - 1];
  reg signed [DATA_BITS - 1:0] weight [0:INPUT_NUM * OUTPUT_NUM - 1];
  reg signed [DATA_BITS - 1:0] bias [0:OUTPUT_NUM - 1];
    
  wire signed [19:0] calc_out;
  wire signed [13:0] data1, data2, data3;
-integer i;
+
+ integer i;
+ // weight 및 bias 연산부
  always @(*) begin
     for(i=0;i<=479;i=i+1) begin
         weight[i]=w_fc[(8*i)+:8];
@@ -47,45 +66,72 @@ integer i;
     end
 end
  
- 
- assign data1 = (data_in_1[11] == 1) ? {2'b11, data_in_1} : {2'b00, data_in_1};
- assign data2 = (data_in_2[11] == 1) ? {2'b11, data_in_2} : {2'b00, data_in_2};
- assign data3 = (data_in_3[11] == 1) ? {2'b11, data_in_3} : {2'b00, data_in_3};
- 
+ assign data1 = {{2{data_in_1[11]}}, data_in_1};
+ assign data2 = {{2{data_in_2[11]}}, data_in_2};
+ assign data3 = {{2{data_in_3[11]}}, data_in_3};
+
+ // FC 제어부
  always @(posedge clk) begin
    if(~rst_n) begin
-     valid_out_fc <= 0;
-     buf_idx <= 0;
-     out_idx <= 0;
-     state <= 0;
+     valid_out_fc <= 1'b0;
+     data_out <= 12'd0;
+     buf_idx <= 4'd0;
+     out_idx <= 4'd0;
+     state <= ST_COLLECT;
    end
+   else begin
+     valid_out_fc <= 1'b0;
 
-   if(valid_out_fc == 1) begin
-     valid_out_fc <= 0;
-   end
+     case (state)
+     /*
+     총 48개의 input features 수집
+     data_in_1 -> buffer[0:15]
+     data_in_2 -> buffer[16:31]
+     data_in_3 -> buffer[32:47]
+     */
+     ST_COLLECT: begin
+      if (valid_in) begin
+        buffer[buf_idx] <= data1;
+        buffer[INPUT_WIDTH + buf_idx] <= data2;
+        buffer[(INPUT_WIDTH*2) + buf_idx] <= data3;
 
-   if(valid_in == 1) begin
-     // Wait until 48 input data filled in buffer
-     if(!state) begin
-       buffer[buf_idx] <= data1;
-       buffer[INPUT_WIDTH + buf_idx] <= data2;
-       buffer[INPUT_WIDTH * 2 + buf_idx] <= data3;
-       buf_idx <= buf_idx + 1'b1;
-       if(buf_idx == INPUT_WIDTH - 1) begin
-         buf_idx <= 0;
-         state <= 1;
-         valid_out_fc <= 1;
-       end
-     end else begin // valid state
-       out_idx <= out_idx + 1'b1;
-       if(out_idx == OUTPUT_NUM - 1) begin
-         out_idx <= 0;
-       end
-       valid_out_fc <= 1;
+        if (buf_idx == INPUT_WIDTH - 1) begin
+          buf_idx <= 4'd0;
+          out_idx <= 4'd0;
+          state <= ST_OUTPUT;
+        end
+        else begin
+          buf_idx <= buf_idx + 1;
+        end
+      end
      end
+     /*
+     FC output 10개 생성
+     */
+     ST_OUTPUT: begin
+      data_out <= calc_out[18:7];
+      valid_out_fc <= 1'b1;
+
+      if (out_idx == OUTPUT_NUM - 1) begin
+        out_idx <= 4'd0;
+        state <= ST_DONE;
+      end
+      else begin
+        out_idx <= out_idx + 1'b1;
+      end
+     end
+
+     default: begin
+      valid_out_fc <= 1'b0;
+      buf_idx <= 4'd0;
+      out_idx <= 4'd0;
+      state <= ST_COLLECT;
+     end
+     endcase
    end
  end
 
+ // 48개의 input에 대해 dot-product 수행
  assign calc_out = weight[out_idx * INPUT_NUM] * buffer[0] + weight[out_idx * INPUT_NUM + 1] * buffer[1] + 
 		  		weight[out_idx * INPUT_NUM + 2] * buffer[2] + weight[out_idx * INPUT_NUM + 3] * buffer[3] + 
   				weight[out_idx * INPUT_NUM + 4] * buffer[4] + weight[out_idx * INPUT_NUM + 5] * buffer[5] + 
@@ -111,6 +157,5 @@ end
 	  			weight[out_idx * INPUT_NUM + 44] * buffer[44] + weight[out_idx * INPUT_NUM + 45] * buffer[45] + 
   				weight[out_idx * INPUT_NUM + 46] * buffer[46] + weight[out_idx * INPUT_NUM + 47] * buffer[47] + 
   				bias[out_idx];
- always @(*)  data_out = calc_out[18:7];
 
- endmodule
+endmodule
