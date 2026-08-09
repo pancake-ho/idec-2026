@@ -201,6 +201,8 @@ reg state;
 integer i_cnt;  // loop variable
 reg [9:0] accuracy; // hit/miss count (1000)
 
+integer cycle_count; // 총 clock cycles 기록용 변수
+
 
 wire [3:0] decision;
 wire valid_out_6;
@@ -331,10 +333,11 @@ end
 
 always @(posedge clk) begin
   if(~rst_n) begin
-
     #3
     rst_n <= 1'b1;
+    cycle_count <= 0;
   end else begin
+    cycle_count <= cycle_count + 1;
     // decision done
     if(valid_out_6 == 1'b1) begin
       if(state !== 1'bx) begin
@@ -374,6 +377,10 @@ always @(posedge clk) begin
       input_cnt <= input_cnt + 1'b1;
       rand_num <= $urandom_range(0, 1000);
       //rand_num <= rand_num + 1'b1;
+      $display("======================================");
+      $display("Total cycles = %0d", cycle_count + 1);
+      $display("Decision     = %0d", decision);
+      $display("======================================");
     end
 
     if(state == 1'b0) begin
