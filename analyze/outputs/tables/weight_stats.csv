@@ -1,0 +1,7 @@
+name,declared_bits,signed,min,max,required_bits,count,zero_count,zero_ratio
+Conv1 weight,8,1,-76,96,8,75,1,0.013333333333333334
+Conv1 bias,8,1,-21,12,6,3,1,0.3333333333333333
+Conv2 weight,8,1,-74,82,8,225,5,0.022222222222222223
+Conv2 bias,8,1,-10,21,6,3,0,0.0
+FC weight,8,1,-83,70,8,480,20,0.041666666666666664
+FC bias,8,1,-24,33,7,10,0,0.0
