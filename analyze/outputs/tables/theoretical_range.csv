@@ -1,0 +1,51 @@
+tensor,declared_bits,required_bits_for_bound,min,max,proven_no_wrap,note
+Conv1 ch0 accumulator raw,20,17,-49725,29835,1,All possible uint8 5x5 input patches
+Conv1 ch0 output,12,9,-216,95,1,calc_out[19:8] + bias
+Pool1 ch0,12,8,0,95,1,2x2 max cannot exceed Conv1 channel bound; ReLU
+Conv1 ch1 accumulator raw,20,19,-27540,236640,1,All possible uint8 5x5 input patches
+Conv1 ch1 output,12,11,-108,924,1,calc_out[19:8] + bias
+Pool1 ch1,12,11,0,924,1,2x2 max cannot exceed Conv1 channel bound; ReLU
+Conv1 ch2 accumulator raw,20,19,-67320,173655,1,All possible uint8 5x5 input patches
+Conv1 ch2 output,12,11,-251,690,1,calc_out[19:8] + bias
+Pool1 ch2,12,11,0,690,1,2x2 max cannot exceed Conv1 channel bound; ReLU
+Conv2 out0/in0 partial,20,15,-12350,5035,1,25-MAC theoretical bound
+Conv2 out0/in1 partial,20,20,-303072,517440,1,25-MAC theoretical bound
+Conv2 out0/in2 partial,20,20,-363630,32430,1,25-MAC theoretical bound
+Conv2 out0 accumulator,20,21,-679052,554905,0,Sum of three signed 20-bit partial results
+Conv2 out0 internal14,14,14,-8192,8191,0,calc_out[19:6]
+Conv2 out0 output,12,12,-2048,2047,0,conv_out[13:1] + bias
+Pool2 ch0,12,12,0,2047,0,2x2 max + ReLU
+Conv2 out1/in0 partial,20,15,-6935,8360,1,25-MAC theoretical bound
+Conv2 out1/in1 partial,20,20,-277200,194040,1,25-MAC theoretical bound
+Conv2 out1/in2 partial,20,20,-62100,382260,1,25-MAC theoretical bound
+Conv2 out1 accumulator,20,21,-346235,584660,0,Sum of three signed 20-bit partial results
+Conv2 out1 internal14,14,14,-8192,8191,0,calc_out[19:6]
+Conv2 out1 output,12,12,-2048,2047,0,conv_out[13:1] + bias
+Pool2 ch1,12,12,0,2047,0,2x2 max + ReLU
+Conv2 out2/in0 partial,20,15,-9120,7220,1,25-MAC theoretical bound
+Conv2 out2/in1 partial,20,20,-187572,385308,1,25-MAC theoretical bound
+Conv2 out2/in2 partial,20,19,-212520,44160,1,25-MAC theoretical bound
+Conv2 out2 accumulator,20,20,-409212,436688,1,Sum of three signed 20-bit partial results
+Conv2 out2 internal14,14,14,-6394,6823,1,calc_out[19:6]
+Conv2 out2 output,12,12,-2048,2047,0,conv_out[13:1] + bias
+Pool2 ch2,12,12,0,2047,0,2x2 max + ReLU
+FC class0 accumulator,20,21,-857688,814711,0,48-MAC + bias
+FC class0 logit,12,12,-2048,2047,0,"calc_out[18:7]; non-top part-select, full 12-bit range reported conservatively"
+FC class1 accumulator,20,22,-884311,1099232,0,48-MAC + bias
+FC class1 logit,12,12,-2048,2047,0,"calc_out[18:7]; non-top part-select, full 12-bit range reported conservatively"
+FC class2 accumulator,20,21,-1025535,1041935,0,48-MAC + bias
+FC class2 logit,12,12,-2048,2047,0,"calc_out[18:7]; non-top part-select, full 12-bit range reported conservatively"
+FC class3 accumulator,20,21,-1033746,792178,0,48-MAC + bias
+FC class3 logit,12,12,-2048,2047,0,"calc_out[18:7]; non-top part-select, full 12-bit range reported conservatively"
+FC class4 accumulator,20,21,-790152,1009161,0,48-MAC + bias
+FC class4 logit,12,12,-2048,2047,0,"calc_out[18:7]; non-top part-select, full 12-bit range reported conservatively"
+FC class5 accumulator,20,21,-1037796,984640,0,48-MAC + bias
+FC class5 logit,12,12,-2048,2047,0,"calc_out[18:7]; non-top part-select, full 12-bit range reported conservatively"
+FC class6 accumulator,20,22,-1091075,970254,0,48-MAC + bias
+FC class6 logit,12,12,-2048,2047,0,"calc_out[18:7]; non-top part-select, full 12-bit range reported conservatively"
+FC class7 accumulator,20,22,-1025543,1134042,0,48-MAC + bias
+FC class7 logit,12,12,-2048,2047,0,"calc_out[18:7]; non-top part-select, full 12-bit range reported conservatively"
+FC class8 accumulator,20,21,-757404,751235,0,48-MAC + bias
+FC class8 logit,12,12,-2048,2047,0,"calc_out[18:7]; non-top part-select, full 12-bit range reported conservatively"
+FC class9 accumulator,20,22,-1156573,933414,0,48-MAC + bias
+FC class9 logit,12,12,-2048,2047,0,"calc_out[18:7]; non-top part-select, full 12-bit range reported conservatively"
