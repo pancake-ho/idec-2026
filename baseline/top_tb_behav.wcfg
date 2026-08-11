@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wave_config>
+   <wave_state>
+   </wave_state>
+   <db_ref_list>
+      <db_ref path="top_tb_behav.wdb" id="1">
+         <top_modules>
+            <top_module name="glbl" />
+            <top_module name="top_tb" />
+         </top_modules>
+      </db_ref>
+   </db_ref_list>
+   <zoom_setting>
+      <ZoomStartTime time="0 ps"></ZoomStartTime>
+      <ZoomEndTime time="231 ps"></ZoomEndTime>
+      <Cursor1Time time="0 ps"></Cursor1Time>
+   </zoom_setting>
+   <column_width_setting>
+      <NameColumnWidth column_width="297"></NameColumnWidth>
+      <ValueColumnWidth column_width="149"></ValueColumnWidth>
+   </column_width_setting>
+   <WVObjectSize size="50" />
+   <wvobject fp_name="/top_tb/clk" type="logic">
+      <obj_property name="ElementShortName">clk</obj_property>
+      <obj_property name="ObjectShortName">clk</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_tb/rst_n" type="logic">
+      <obj_property name="ElementShortName">rst_n</obj_property>
+      <obj_property name="ObjectShortName">rst_n</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_tb/pixels" type="array">
+      <obj_property name="ElementShortName">pixels[0:783][7:0]</obj_property>
+      <obj_property name="ObjectShortName">pixels[0:783][7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_tb/img_idx" type="array">
+      <obj_property name="ElementShortName">img_idx[9:0]</obj_property>
+      <obj_property name="ObjectShortName">img_idx[9:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_tb/data_in" type="array">
+      <obj_property name="ElementShortName">data_in[7:0]</obj_property>
+      <obj_property name="ObjectShortName">data_in[7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_tb/decision" type="array">
+      <obj_property name="ElementShortName">decision[3:0]</obj_property>
+      <obj_property name="ObjectShortName">decision[3:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_tb/valid_out_6" type="logic">
+      <obj_property name="ElementShortName">valid_out_6</obj_property>
+      <obj_property name="ObjectShortName">valid_out_6</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_tb/weight_11" type="array">
+      <obj_property name="ElementShortName">weight_11[0:24][7:0]</obj_property>
+      <obj_property name="ObjectShortName">weight_11[0:24][7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_tb/weight_12" type="array">
+      <obj_property name="ElementShortName">weight_12[0:24][7:0]</obj_property>
+      <obj_property name="ObjectShortName">weight_12[0:24][7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_tb/weight_13" type="array">
+      <obj_property name="ElementShortName">weight_13[0:24][7:0]</obj_property>
+      <obj_property name="ObjectShortName">weight_13[0:24][7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_tb/bias_1" type="array">
+      <obj_property name="ElementShortName">bias_1[0:2][7:0]</obj_property>
+      <obj_property name="ObjectShortName">bias_1[0:2][7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_tb/bias_2" type="array">
+      <obj_property name="ElementShortName">bias_2[0:2][7:0]</obj_property>
+      <obj_property name="ObjectShortName">bias_2[0:2][7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_tb/weight_211" type="array">
+      <obj_property name="ElementShortName">weight_211[0:24][7:0]</obj_property>
+      <obj_property name="ObjectShortName">weight_211[0:24][7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_tb/weight_212" type="array">
+      <obj_property name="ElementShortName">weight_212[0:24][7:0]</obj_property>
+      <obj_property name="ObjectShortName">weight_212[0:24][7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_tb/weight_213" type="array">
+      <obj_property name="ElementShortName">weight_213[0:24][7:0]</obj_property>
+      <obj_property name="ObjectShortName">weight_213[0:24][7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_tb/weight_221" type="array">
+      <obj_property name="ElementShortName">weight_221[0:24][7:0]</obj_property>
+      <obj_property name="ObjectShortName">weight_221[0:24][7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_tb/weight_222" type="array">
+      <obj_property name="ElementShortName">weight_222[0:24][7:0]</obj_property>
+      <obj_property name="ObjectShortName">weight_222[0:24][7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_tb/weight_223" type="array">
+      <obj_property name="ElementShortName">weight_223[0:24][7:0]</obj_property>
+      <obj_property name="ObjectShortName">weight_223[0:24][7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_tb/weight_231" type="array">
+      <obj_property name="ElementShortName">weight_231[0:24][7:0]</obj_property>
+      <obj_property name="ObjectShortName">weight_231[0:24][7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_tb/weight_232" type="array">
+      <obj_property name="ElementShortName">weight_232[0:24][7:0]</obj_property>
+      <obj_property name="ObjectShortName">weight_232[0:24][7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_tb/weight_233" type="array">
+      <obj_property name="ElementShortName">weight_233[0:24][7:0]</obj_property>
+      <obj_property name="ObjectShortName">weight_233[0:24][7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_tb/weight_fc" type="array">
+      <obj_property name="ElementShortName">weight_fc[0:479][7:0]</obj_property>
+      <obj_property name="ObjectShortName">weight_fc[0:479][7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_tb/bias_fc" type="array">
+      <obj_property name="ElementShortName">bias_fc[0:9][7:0]</obj_property>
+      <obj_property name="ObjectShortName">bias_fc[0:9][7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_tb/w_11" type="array">
+      <obj_property name="ElementShortName">w_11[0:199]</obj_property>
+      <obj_property name="ObjectShortName">w_11[0:199]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_tb/w_12" type="array">
+      <obj_property name="ElementShortName">w_12[0:199]</obj_property>
+      <obj_property name="ObjectShortName">w_12[0:199]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_tb/w_13" type="array">
+      <obj_property name="ElementShortName">w_13[0:199]</obj_property>
+      <obj_property name="ObjectShortName">w_13[0:199]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_tb/b_1" type="array">
+      <obj_property name="ElementShortName">b_1[0:23]</obj_property>
+      <obj_property name="ObjectShortName">b_1[0:23]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_tb/b_2" type="array">
+      <obj_property name="ElementShortName">b_2[0:23]</obj_property>
+      <obj_property name="ObjectShortName">b_2[0:23]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_tb/w_211" type="array">
+      <obj_property name="ElementShortName">w_211[0:199]</obj_property>
+      <obj_property name="ObjectShortName">w_211[0:199]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_tb/w_212" type="array">
+      <obj_property name="ElementShortName">w_212[0:199]</obj_property>
+      <obj_property name="ObjectShortName">w_212[0:199]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_tb/w_213" type="array">
+      <obj_property name="ElementShortName">w_213[0:199]</obj_property>
+      <obj_property name="ObjectShortName">w_213[0:199]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_tb/w_221" type="array">
+      <obj_property name="ElementShortName">w_221[0:199]</obj_property>
+      <obj_property name="ObjectShortName">w_221[0:199]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_tb/w_222" type="array">
+      <obj_property name="ElementShortName">w_222[0:199]</obj_property>
+      <obj_property name="ObjectShortName">w_222[0:199]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_tb/w_223" type="array">
+      <obj_property name="ElementShortName">w_223[0:199]</obj_property>
+      <obj_property name="ObjectShortName">w_223[0:199]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_tb/w_231" type="array">
+      <obj_property name="ElementShortName">w_231[0:199]</obj_property>
+      <obj_property name="ObjectShortName">w_231[0:199]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_tb/w_232" type="array">
+      <obj_property name="ElementShortName">w_232[0:199]</obj_property>
+      <obj_property name="ObjectShortName">w_232[0:199]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_tb/w_233" type="array">
+      <obj_property name="ElementShortName">w_233[0:199]</obj_property>
+      <obj_property name="ObjectShortName">w_233[0:199]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_tb/w_fc" type="array">
+      <obj_property name="ElementShortName">w_fc[0:3839]</obj_property>
+      <obj_property name="ObjectShortName">w_fc[0:3839]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_tb/b_fc" type="array">
+      <obj_property name="ElementShortName">b_fc[0:79]</obj_property>
+      <obj_property name="ObjectShortName">b_fc[0:79]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_tb/DATA_BITS" type="array">
+      <obj_property name="ElementShortName">DATA_BITS[31:0]</obj_property>
+      <obj_property name="ObjectShortName">DATA_BITS[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_tb/chip1/fully_connected/valid_in" type="logic">
+      <obj_property name="ElementShortName">valid_in</obj_property>
+      <obj_property name="ObjectShortName">valid_in</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_tb/chip1/fully_connected/data_out" type="array">
+      <obj_property name="ElementShortName">data_out[11:0]</obj_property>
+      <obj_property name="ObjectShortName">data_out[11:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_tb/chip1/fully_connected/valid_out_fc" type="logic">
+      <obj_property name="ElementShortName">valid_out_fc</obj_property>
+      <obj_property name="ObjectShortName">valid_out_fc</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_tb/chip1/fully_connected/state" type="array">
+      <obj_property name="ElementShortName">state[1:0]</obj_property>
+      <obj_property name="ObjectShortName">state[1:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_tb/chip1/fully_connected/buf_idx" type="array">
+      <obj_property name="ElementShortName">buf_idx[3:0]</obj_property>
+      <obj_property name="ObjectShortName">buf_idx[3:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_tb/chip1/fully_connected/out_idx" type="array">
+      <obj_property name="ElementShortName">out_idx[3:0]</obj_property>
+      <obj_property name="ObjectShortName">out_idx[3:0]</obj_property>
+      <obj_property name="WaveformStyle">STYLE_ANALOG</obj_property>
+      <obj_property name="CellHeight">100</obj_property>
+      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      <obj_property name="AnalogYRangeType">ANALOG_YRANGETYPE_FIXED</obj_property>
+      <obj_property name="AnalogYRangeMin">0</obj_property>
+      <obj_property name="AnalogYRRangeMax">19</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_tb/chip1/fully_connected/calc_out" type="array">
+      <obj_property name="ElementShortName">calc_out[19:0]</obj_property>
+      <obj_property name="ObjectShortName">calc_out[19:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_tb/chip1/comparator/valid_in" type="logic">
+      <obj_property name="ElementShortName">valid_in</obj_property>
+      <obj_property name="ObjectShortName">valid_in</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_tb/chip1/comparator/decision" type="array">
+      <obj_property name="ElementShortName">decision[3:0]</obj_property>
+      <obj_property name="ObjectShortName">decision[3:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_tb/chip1/comparator/buf_idx" type="array">
+      <obj_property name="ElementShortName">buf_idx[3:0]</obj_property>
+      <obj_property name="ObjectShortName">buf_idx[3:0]</obj_property>
+   </wvobject>
+</wave_config>
