@@ -1,0 +1,12 @@
+build/
+logs/
+reports/
+results/
+objects/
+.Xil/
+*.jou
+*.log
+*.pb
+*.str
+*.wdb
+*.vcd
