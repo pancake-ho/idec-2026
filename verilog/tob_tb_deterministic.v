@@ -8,6 +8,11 @@ module top_tb_deterministic;
   parameter RESULT_FILE =
     "C:/Users/surt1_xl6lr7u/Downloads/idec/Reference code/Reference code/Reference code/proposed/analyze/outputs/rtl_predictions.csv";
 
+
+  // ============================================================
+  // Basic signals
+  // ============================================================
+
   reg clk;
   reg rst_n;
   reg [7:0] data_in;
@@ -16,6 +21,7 @@ module top_tb_deterministic;
 
   wire [3:0] decision;
   wire valid_out_6;
+
 
   // ============================================================
   // Conv1 parameters
@@ -26,6 +32,7 @@ module top_tb_deterministic;
   reg signed [7:0] weight_13 [0:24];
 
   reg signed [7:0] bias_1 [0:2];
+
 
   // ============================================================
   // Conv2 parameters
@@ -45,6 +52,7 @@ module top_tb_deterministic;
   reg signed [7:0] weight_232 [0:24];
   reg signed [7:0] weight_233 [0:24];
 
+
   // ============================================================
   // FC parameters
   // ============================================================
@@ -52,36 +60,48 @@ module top_tb_deterministic;
   reg signed [7:0] weight_fc [0:479];
   reg signed [7:0] bias_fc [0:9];
 
+
   // ============================================================
-  // Packed buses to DUT
+  // Packed buses
   // ============================================================
 
-  wire [0:199] w_11;
-  wire [0:199] w_12;
-  wire [0:199] w_13;
+  wire signed [0:199] w_11;
+  wire signed [0:199] w_12;
+  wire signed [0:199] w_13;
 
-  wire [0:23] b_1;
-  wire [0:23] b_2;
+  wire signed [0:23] b_1;
+  wire signed [0:23] b_2;
 
-  wire [0:199] w_211;
-  wire [0:199] w_212;
-  wire [0:199] w_213;
+  wire signed [0:199] w_211;
+  wire signed [0:199] w_212;
+  wire signed [0:199] w_213;
 
-  wire [0:199] w_221;
-  wire [0:199] w_222;
-  wire [0:199] w_223;
+  wire signed [0:199] w_221;
+  wire signed [0:199] w_222;
+  wire signed [0:199] w_223;
 
-  wire [0:199] w_231;
-  wire [0:199] w_232;
-  wire [0:199] w_233;
+  wire signed [0:199] w_231;
+  wire signed [0:199] w_232;
+  wire signed [0:199] w_233;
 
-  wire [0:3839] w_fc;
-  wire [0:79] b_fc;
+  wire signed [0:3839] w_fc;
+  wire signed [0:79] b_fc;
+
+
+  // ============================================================
+  // Test variables
+  // ============================================================
 
   integer result_fd;
+
   integer image_id;
+  integer pixel_idx;
+  integer base_idx;
+  integer expected;
+
   integer total_correct;
   integer cycle_count;
+
 
   // ============================================================
   // Clock
@@ -95,16 +115,18 @@ module top_tb_deterministic;
 
 
   // ============================================================
-  // Per-inference cycle counter
+  // Cycle counter
   // ============================================================
 
   always @(posedge clk) begin
+
     if (!rst_n) begin
       cycle_count <= 0;
     end
     else begin
       cycle_count <= cycle_count + 1;
     end
+
   end
 
 
@@ -116,7 +138,11 @@ module top_tb_deterministic;
 
   generate
 
-    for (g = 0; g < 25; g = g + 1) begin : GEN_CONV_WEIGHT_PACK
+    for (
+      g = 0;
+      g < 25;
+      g = g + 1
+    ) begin : GEN_CONV_WEIGHT_PACK
 
       assign w_11[(8*g)+:8] = weight_11[g];
       assign w_12[(8*g)+:8] = weight_12[g];
@@ -136,20 +162,35 @@ module top_tb_deterministic;
 
     end
 
-    for (g = 0; g < 3; g = g + 1) begin : GEN_CONV_BIAS_PACK
+
+    for (
+      g = 0;
+      g < 3;
+      g = g + 1
+    ) begin : GEN_CONV_BIAS_PACK
 
       assign b_1[(8*g)+:8] = bias_1[g];
       assign b_2[(8*g)+:8] = bias_2[g];
 
     end
 
-    for (g = 0; g < 480; g = g + 1) begin : GEN_FC_WEIGHT_PACK
+
+    for (
+      g = 0;
+      g < 480;
+      g = g + 1
+    ) begin : GEN_FC_WEIGHT_PACK
 
       assign w_fc[(8*g)+:8] = weight_fc[g];
 
     end
 
-    for (g = 0; g < 10; g = g + 1) begin : GEN_FC_BIAS_PACK
+
+    for (
+      g = 0;
+      g < 10;
+      g = g + 1
+    ) begin : GEN_FC_BIAS_PACK
 
       assign b_fc[(8*g)+:8] = bias_fc[g];
 
@@ -163,102 +204,148 @@ module top_tb_deterministic;
   // ============================================================
 
   chip chip1 (
-    .clk(clk),
-    .rst_n(rst_n),
-    .data_in(data_in),
-    .decision(decision),
-    .valid_out_6(valid_out_6),
+    clk,
+    rst_n,
+    data_in,
+    decision,
+    valid_out_6,
 
-    .w_11(w_11),
-    .w_12(w_12),
-    .w_13(w_13),
-    .b_1(b_1),
+    w_11,
+    w_12,
+    w_13,
+    b_1,
 
-    .b_2(b_2),
+    b_2,
 
-    .w_211(w_211),
-    .w_212(w_212),
-    .w_213(w_213),
+    w_211,
+    w_212,
+    w_213,
 
-    .w_221(w_221),
-    .w_222(w_222),
-    .w_223(w_223),
+    w_221,
+    w_222,
+    w_223,
 
-    .w_231(w_231),
-    .w_232(w_232),
-    .w_233(w_233),
+    w_231,
+    w_232,
+    w_233,
 
-    .w_fc(w_fc),
-    .b_fc(b_fc)
+    w_fc,
+    b_fc
   );
 
 
   // ============================================================
-  // Run exactly one image
+  // Run one image
+  //
+  // IMPORTANT:
+  //
+  // This intentionally reproduces the timing semantics of the
+  // official top_tb:
+  //
+  //     always @(posedge clk)
+  //         data_in <= pixels[img_idx];
+  //
+  // Because the DUT also samples data_in at posedge, it observes
+  // the PREVIOUS data_in value on that edge.
+  //
+  // Therefore:
+  //
+  // first post-reset edge : dummy input
+  // second edge           : pixel[0]
+  // third edge            : pixel[1]
+  // ...
+  //
+  // Do NOT move pixel updates to negedge.
   // ============================================================
 
   task run_one_image;
 
     input integer current_image;
 
-    integer pixel_idx;
-    integer base_idx;
-    integer expected;
-
     begin
 
       base_idx = current_image * 784;
       expected = current_image % 10;
 
+
       // --------------------------------------------------------
-      // Reset between images
+      // Reset
       // --------------------------------------------------------
 
       rst_n = 1'b0;
       data_in = 8'd0;
 
+      /*
+       * Hold reset through at least two rising edges so every
+       * sequential RTL block is initialized.
+       */
       repeat (2) begin
-        @(negedge clk);
+        @(posedge clk);
       end
 
-      // --------------------------------------------------------
-      // Release reset and present pixel 0 before next posedge
-      // --------------------------------------------------------
+
+      /*
+       * Release reset away from the sampling edge.
+       */
+      @(negedge clk);
 
       rst_n = 1'b1;
-      data_in = pixels[base_idx];
 
-      // pixel 0 is now stable before the next rising edge.
-      // Feed pixels 1 ... 783 on following falling edges.
+
+      // --------------------------------------------------------
+      // Supply 784 pixels using the SAME semantics as top_tb.v.
+      //
+      // Nonblocking assignment is intentional.
+      //
+      // At each posedge:
+      //   DUT samples previous data_in
+      //   TB schedules next pixel into data_in
+      // --------------------------------------------------------
 
       for (
-        pixel_idx = 1;
+        pixel_idx = 0;
         pixel_idx < 784;
         pixel_idx = pixel_idx + 1
       ) begin
 
-        @(negedge clk);
+        @(posedge clk);
 
-        data_in = pixels[
+        data_in <= pixels[
           base_idx + pixel_idx
         ];
 
       end
 
-      // Ensure pixel 783 is sampled at the next rising edge.
-      @(negedge clk);
 
-      // No further image data should pollute the current inference.
-      data_in = 8'd0;
+      /*
+       * At the previous posedge pixel[783] was only scheduled.
+       *
+       * One additional posedge is required for the DUT to
+       * actually sample pixel[783].
+       */
+      @(posedge clk);
+
+      data_in <= 8'd0;
+
 
       // --------------------------------------------------------
-      // Wait for final decision
+      // Wait for final classifier result
       // --------------------------------------------------------
 
       wait(valid_out_6 === 1'b1);
 
-      // Allow NBA updates at the decision edge to settle.
+      /*
+       * valid_out_6 / decision / cycle_count are updated through
+       * nonblocking assignments around the clock edge.
+       *
+       * Wait 1 ps so all NBA updates have settled.
+       */
       #1;
+
+
+      // --------------------------------------------------------
+      // Save result
+      // --------------------------------------------------------
 
       $fwrite(
         result_fd,
@@ -269,16 +356,22 @@ module top_tb_deterministic;
         cycle_count
       );
 
+
       if (decision == expected) begin
-        total_correct = total_correct + 1;
+
+        total_correct =
+          total_correct + 1;
+
       end
 
+
       if (
-        ((current_image + 1) % 100) == 0
+        ((current_image + 1) % 100)
+        == 0
       ) begin
 
         $display(
-          "Processed %0d / 1000, current correct = %0d",
+          "Processed %0d / 1000, correct = %0d",
           current_image + 1,
           total_correct
         );
@@ -291,7 +384,7 @@ module top_tb_deterministic;
 
 
   // ============================================================
-  // Main test
+  // Main
   // ============================================================
 
   initial begin
@@ -299,11 +392,12 @@ module top_tb_deterministic;
     rst_n = 1'b0;
     data_in = 8'd0;
 
-    cycle_count = 0;
     total_correct = 0;
+    cycle_count = 0;
+
 
     // ----------------------------------------------------------
-    // Input images
+    // Read dataset
     // ----------------------------------------------------------
 
     $readmemh(
@@ -311,8 +405,9 @@ module top_tb_deterministic;
       pixels
     );
 
+
     // ----------------------------------------------------------
-    // Conv1
+    // Read Conv1 parameters
     // ----------------------------------------------------------
 
     $readmemh(
@@ -335,8 +430,9 @@ module top_tb_deterministic;
       bias_1
     );
 
+
     // ----------------------------------------------------------
-    // Conv2
+    // Read Conv2 parameters
     // ----------------------------------------------------------
 
     $readmemh(
@@ -389,8 +485,9 @@ module top_tb_deterministic;
       weight_233
     );
 
+
     // ----------------------------------------------------------
-    // FC
+    // Read FC parameters
     // ----------------------------------------------------------
 
     $readmemh(
@@ -403,8 +500,9 @@ module top_tb_deterministic;
       bias_fc
     );
 
+
     // ----------------------------------------------------------
-    // Output CSV
+    // Open result CSV
     // ----------------------------------------------------------
 
     result_fd = $fopen(
@@ -412,10 +510,15 @@ module top_tb_deterministic;
       "w"
     );
 
+
     if (result_fd == 0) begin
 
       $display(
-        "ERROR: Cannot open result file: %s",
+        "ERROR: failed to open result file."
+      );
+
+      $display(
+        "%s",
         RESULT_FILE
       );
 
@@ -423,13 +526,15 @@ module top_tb_deterministic;
 
     end
 
+
     $fwrite(
       result_fd,
       "image_index,expected,predicted,cycles\n"
     );
 
+
     // ----------------------------------------------------------
-    // Deterministic image 0 -> 999
+    // Deterministic evaluation
     // ----------------------------------------------------------
 
     for (
@@ -444,6 +549,11 @@ module top_tb_deterministic;
 
     end
 
+
+    // ----------------------------------------------------------
+    // Finish
+    // ----------------------------------------------------------
+
     rst_n = 1'b0;
     data_in = 8'd0;
 
@@ -451,9 +561,10 @@ module top_tb_deterministic;
       result_fd
     );
 
+
     $display("");
     $display(
-      "========================================"
+      "=============================================="
     );
 
     $display(
@@ -476,8 +587,9 @@ module top_tb_deterministic;
     );
 
     $display(
-      "========================================"
+      "=============================================="
     );
+
 
     $finish;
 
