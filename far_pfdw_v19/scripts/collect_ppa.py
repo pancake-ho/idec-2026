@@ -79,6 +79,7 @@ def load_row(
             float(
                 metric(
                     data,
+                    "finish__design__instance__count__class__sequential_cell",
                     "finish__design__instance__count__class:sequential_cell",
                     "finish__design__instance__count__sequential",
                 )
@@ -86,16 +87,12 @@ def load_row(
         )
     )
 
-    # ORFS metadata metrics use W for total power and ns for timing slack.
-    # run__flow__platform__*_units describe OpenDB database resolution and
-    # must not be applied as a multiplier to these normalized metrics.
+    # Pinned ASAP7 ORFS metadata uses W for power and ps for timing.
     power_raw_w = float(metric(data, "finish__power__total"))
     power_mw = power_raw_w * 1e3
 
-    wns_raw = float(metric(data, "finish__timing__setup__ws"))
-    tns_raw = float(metric(data, "finish__timing__setup__tns"))
-    wns_ps = wns_raw * 1e3
-    tns_ps = tns_raw * 1e3
+    wns_ps = float(metric(data, "finish__timing__setup__ws"))
+    tns_ps = float(metric(data, "finish__timing__setup__tns"))
 
     latency_ns = cycles * CLOCK_PERIOD_NS if cycles is not None else None
     energy_nj = (
