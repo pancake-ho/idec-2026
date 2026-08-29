@@ -1,0 +1,24 @@
+{
+  "name": "PFDW V20 W5 power-of-two",
+  "source_baseline": "far_pfdw_v19/reference_v18a",
+  "weight_bits": 5,
+  "post_mac_left_shift": 3,
+  "rounding": {
+    "conv1": "floor",
+    "conv2": "truncate_to_zero",
+    "fc": "nearest_even"
+  },
+  "python_bit_exact_precheck": {
+    "dataset": "data/input_1000.txt",
+    "baseline_correct": 970,
+    "candidate_correct": 980,
+    "decision_match": 950,
+    "decision_mismatch": 50
+  },
+  "acceptance": {
+    "minimum_correct": 970,
+    "rtl_required": true,
+    "gate_level_required": true,
+    "ppa_must_use_same_orfs_commit_and_constraints": true
+  }
+}

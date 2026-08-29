@@ -1,0 +1,387 @@
+`timescale 1ps/1ps
+
+// ============================================================================
+// V18A vs V20 W5 cycle and decision comparison for 1000 images.
+//
+// - Feeds the EXACT SAME image stream to both DUTs.
+// - Uses images 0..999 exactly once.
+// - Latches each DUT's decision when its own valid_out_6 asserts.
+// - Reports:
+//     1) Baseline accuracy
+//     2) PFDW+FC accuracy
+//     3) Baseline-vs-PFDW decision match count
+//
+// Required design sources:
+//   Baseline: chip.v, conv1.v, conv2.v, maxpool_relu.v, fc.v, comparator.v
+//   PFDW   : chip_pfdw_fc_proto.sv, pfdw_shared_engine.sv
+// ============================================================================
+
+module top_tb_cycle_v20_vs_v18a;
+
+    reg clk, rst_n;
+    reg [7:0] pixels [0:783999];
+    reg [7:0] data_in;
+
+    integer sample_idx;
+    integer pixel_idx;
+    integer expected;
+
+    integer baseline_correct;
+    integer pfdw_correct;
+    integer match_count;
+    integer mismatch_count;
+    integer xz_count;
+
+    time image_start_time;
+    time base_done_time;
+    time pfdw_done_time;
+
+    integer base_cycles;
+    integer pfdw_cycles;
+
+    integer base_cycles_min;
+    integer base_cycles_max;
+    integer pfdw_cycles_min;
+    integer pfdw_cycles_max;
+
+    integer base_cycles_sum;
+    integer pfdw_cycles_sum;
+
+    // Baseline outputs
+    wire [3:0] decision_base;
+    wire       valid_base;
+
+    // PFDW outputs
+    wire [3:0] decision_pfdw;
+    wire       valid_pfdw;
+
+    // Latched results, because the two DUTs can finish at different times
+    reg        base_seen;
+    reg        pfdw_seen;
+    reg [3:0]  base_dec_latched;
+    reg [3:0]  pfdw_dec_latched;
+
+
+    // ------------------------------------------------------------------------
+    // Weights / biases
+    // ------------------------------------------------------------------------
+    reg signed [7:0] weight_11 [0:24];
+    reg signed [7:0] weight_12 [0:24];
+    reg signed [7:0] weight_13 [0:24];
+    reg signed [7:0] bias_1 [0:2];
+
+    reg signed [7:0] bias_2 [0:2];
+    reg signed [7:0] weight_211 [0:24];
+    reg signed [7:0] weight_212 [0:24];
+    reg signed [7:0] weight_213 [0:24];
+    reg signed [7:0] weight_221 [0:24];
+    reg signed [7:0] weight_222 [0:24];
+    reg signed [7:0] weight_223 [0:24];
+    reg signed [7:0] weight_231 [0:24];
+    reg signed [7:0] weight_232 [0:24];
+    reg signed [7:0] weight_233 [0:24];
+
+    reg signed [7:0] weight_fc [0:479];
+    reg signed [7:0] bias_fc [0:9];
+
+    wire [0:199]  w_11, w_12, w_13;
+    wire [0:23]   b_1, b_2;
+    wire [0:199]  w_211, w_212, w_213;
+    wire [0:199]  w_221, w_222, w_223;
+    wire [0:199]  w_231, w_232, w_233;
+    wire [0:3839] w_fc;
+    wire [0:79]   b_fc;
+
+    // 10 ps clock period
+    always #5 clk = ~clk;
+
+    // ------------------------------------------------------------------------
+    // Frozen V18A reference DUT
+    // ------------------------------------------------------------------------
+    chip_pfdw_fc_v18a dut_baseline (
+        .clk(clk),
+        .rst_n(rst_n),
+        .data_in(data_in),
+        .decision(decision_base),
+        .valid_out_6(valid_base),
+
+        .w_11(w_11), .w_12(w_12), .w_13(w_13), .b_1(b_1),
+        .b_2(b_2),
+
+        .w_211(w_211), .w_212(w_212), .w_213(w_213),
+        .w_221(w_221), .w_222(w_222), .w_223(w_223),
+        .w_231(w_231), .w_232(w_232), .w_233(w_233),
+
+        .w_fc(w_fc), .b_fc(b_fc)
+    );
+
+    // ------------------------------------------------------------------------
+    // PFDW + shared-FC DUT
+    // ------------------------------------------------------------------------
+    chip_pfdw_fc_v20_pow2 dut_pfdw (
+        .clk(clk),
+        .rst_n(rst_n),
+        .data_in(data_in),
+        .decision(decision_pfdw),
+        .valid_out_6(valid_pfdw),
+
+        .w_11(w_11), .w_12(w_12), .w_13(w_13), .b_1(b_1),
+        .b_2(b_2),
+
+        .w_211(w_211), .w_212(w_212), .w_213(w_213),
+        .w_221(w_221), .w_222(w_222), .w_223(w_223),
+        .w_231(w_231), .w_232(w_232), .w_233(w_233),
+
+        .w_fc(w_fc), .b_fc(b_fc)
+    );
+
+    // ------------------------------------------------------------------------
+    // Pack weight arrays into flat DUT buses
+    // ------------------------------------------------------------------------
+    genvar gi;
+    generate
+        for (gi=0; gi<25; gi=gi+1) begin: PACK_CONV
+            assign w_11 [(8*gi)+:8] = weight_11[gi];
+            assign w_12 [(8*gi)+:8] = weight_12[gi];
+            assign w_13 [(8*gi)+:8] = weight_13[gi];
+
+            assign w_211[(8*gi)+:8] = weight_211[gi];
+            assign w_212[(8*gi)+:8] = weight_212[gi];
+            assign w_213[(8*gi)+:8] = weight_213[gi];
+
+            assign w_221[(8*gi)+:8] = weight_221[gi];
+            assign w_222[(8*gi)+:8] = weight_222[gi];
+            assign w_223[(8*gi)+:8] = weight_223[gi];
+
+            assign w_231[(8*gi)+:8] = weight_231[gi];
+            assign w_232[(8*gi)+:8] = weight_232[gi];
+            assign w_233[(8*gi)+:8] = weight_233[gi];
+        end
+
+        for (gi=0; gi<3; gi=gi+1) begin: PACK_BIAS_CONV
+            assign b_1[(8*gi)+:8] = bias_1[gi];
+            assign b_2[(8*gi)+:8] = bias_2[gi];
+        end
+
+        for (gi=0; gi<480; gi=gi+1) begin: PACK_FC
+            assign w_fc[(8*gi)+:8] = weight_fc[gi];
+        end
+
+        for (gi=0; gi<10; gi=gi+1) begin: PACK_BIAS_FC
+            assign b_fc[(8*gi)+:8] = bias_fc[gi];
+        end
+    endgenerate
+
+    // Decisions are captured directly in the timing fork below at each
+    // DUT's valid_out_6 assertion, avoiding a one-clock testbench race.
+
+    // ------------------------------------------------------------------------
+    // Main test
+    // ------------------------------------------------------------------------
+    initial begin
+        clk              = 1'b0;
+        rst_n            = 1'b0;
+        data_in          = 8'd0;
+
+        baseline_correct = 0;
+        pfdw_correct     = 0;
+        match_count      = 0;
+        mismatch_count   = 0;
+        xz_count         = 0;
+
+        base_cycles_min   = 32'h7fffffff;
+        base_cycles_max   = 0;
+        pfdw_cycles_min   = 32'h7fffffff;
+        pfdw_cycles_max   = 0;
+        base_cycles_sum   = 0;
+        pfdw_cycles_sum   = 0;
+
+        // Dataset
+        $readmemh("data/input_1000.txt", pixels);
+
+        // Weights / biases
+        $readmemh("data/conv1_weight_1.txt", weight_11);
+        $readmemh("data/conv1_weight_2.txt", weight_12);
+        $readmemh("data/conv1_weight_3.txt", weight_13);
+        $readmemh("data/conv1_bias.txt", bias_1);
+
+        $readmemh("data/conv2_bias.txt", bias_2);
+        $readmemh("data/conv2_weight_11.txt", weight_211);
+        $readmemh("data/conv2_weight_12.txt", weight_212);
+        $readmemh("data/conv2_weight_13.txt", weight_213);
+        $readmemh("data/conv2_weight_21.txt", weight_221);
+        $readmemh("data/conv2_weight_22.txt", weight_222);
+        $readmemh("data/conv2_weight_23.txt", weight_223);
+        $readmemh("data/conv2_weight_31.txt", weight_231);
+        $readmemh("data/conv2_weight_32.txt", weight_232);
+        $readmemh("data/conv2_weight_33.txt", weight_233);
+
+        $readmemh("data/fc_weight.txt", weight_fc);
+        $readmemh("data/fc_bias.txt", bias_fc);
+
+        $display("============================================================");
+        $display(" PFDW V18A vs V20 W5: 1000-image cycle comparison");
+        $display(" Images      : 0..999, each exactly once");
+        $display(" Label rule  : image_index %% 10");
+        $display("============================================================");
+
+        for (sample_idx = 0; sample_idx < 1000; sample_idx = sample_idx + 1) begin
+
+            // Reset BOTH designs between images.
+            rst_n   = 1'b0;
+            data_in = 8'd0;
+            base_seen = 1'b0;
+            pfdw_seen = 1'b0;
+            base_dec_latched = 4'd0;
+            pfdw_dec_latched = 4'd0;
+            repeat (3) @(posedge clk);
+
+            // Deassert reset with dummy data first. Both DUTs intentionally
+            // consume one priming cycle:
+            //   - Baseline: conv1_buf has buf_idx=-1, so this cycle is discarded.
+            //   - PFDW sync version: capture_primed discards this cycle.
+            @(negedge clk);
+            rst_n   = 1'b1;
+            data_in = 8'd0;
+            @(posedge clk);
+
+            // Now present actual pixel 0.
+            @(negedge clk);
+            data_in = pixels[sample_idx*784];
+
+            // Common measurement origin:
+            // this rising edge is the cycle where BOTH DUTs consume logical pixel 0.
+            @(posedge clk);
+            image_start_time = $time;
+
+            // Pixels 1..783
+            for (pixel_idx = 1; pixel_idx < 784; pixel_idx = pixel_idx + 1) begin
+                @(negedge clk);
+                data_in = pixels[sample_idx*784 + pixel_idx];
+            end
+
+            // Pixel 783 is captured on next rising edge.
+            @(posedge clk);
+
+            // Record each DUT's valid_out_6 assertion time independently.
+            // The two DUTs are allowed to finish at different cycles.
+            fork
+                begin
+                    wait (valid_base === 1'b1);
+                    base_done_time   = $time;
+                    // valid_base and decision_base are produced together.
+                    // Capture the decision here instead of waiting for the
+                    // next clk edge; otherwise the accuracy check can read
+                    // the reset value before the latch always-block sees
+                    // the one-cycle valid pulse.
+                    base_dec_latched = decision_base;
+                    base_seen        = 1'b1;
+                end
+                begin
+                    wait (valid_pfdw === 1'b1);
+                    pfdw_done_time   = $time;
+                    pfdw_dec_latched = decision_pfdw;
+                    pfdw_seen        = 1'b1;
+                end
+            join
+
+            #1;
+
+            // Clock period = 10 ps.  This reports the number of full clock
+            // intervals from pixel-0 capture to valid_out_6 assertion.
+            base_cycles = (base_done_time - image_start_time) / 10;
+            pfdw_cycles = (pfdw_done_time - image_start_time) / 10;
+
+            base_cycles_sum = base_cycles_sum + base_cycles;
+            pfdw_cycles_sum = pfdw_cycles_sum + pfdw_cycles;
+
+            if (base_cycles < base_cycles_min) base_cycles_min = base_cycles;
+            if (base_cycles > base_cycles_max) base_cycles_max = base_cycles;
+            if (pfdw_cycles < pfdw_cycles_min) pfdw_cycles_min = pfdw_cycles;
+            if (pfdw_cycles > pfdw_cycles_max) pfdw_cycles_max = pfdw_cycles;
+
+            if (sample_idx == 0) begin
+                $display("[IMAGE 0 LATENCY]");
+                $display(" V18A     : %0d cycles  (%0t ps)", base_cycles,
+                         base_done_time - image_start_time);
+                $display(" PFDW V20 W5 : %0d cycles  (%0t ps)", pfdw_cycles,
+                         pfdw_done_time - image_start_time);
+                $display(" Reduction: %0d cycles  (%0.2f %%)",
+                         base_cycles - pfdw_cycles,
+                         (base_cycles - pfdw_cycles) * 100.0 / base_cycles);
+            end
+
+            expected = sample_idx % 10;
+
+            if ($isunknown(base_dec_latched) ||
+                $isunknown(pfdw_dec_latched)) begin
+                xz_count = xz_count + 1;
+                $display("[X/Z] image=%0d baseline=%b pfdw=%b",
+                         sample_idx, base_dec_latched, pfdw_dec_latched);
+            end
+
+            if (base_dec_latched == expected[3:0])
+                baseline_correct = baseline_correct + 1;
+
+            if (pfdw_dec_latched == expected[3:0])
+                pfdw_correct = pfdw_correct + 1;
+
+            if (base_dec_latched == pfdw_dec_latched) begin
+                match_count = match_count + 1;
+            end else begin
+                mismatch_count = mismatch_count + 1;
+                $display("[DECISION MISMATCH] image=%0d expected=%0d baseline=%0d pfdw=%0d time=%0t ps",
+                         sample_idx, expected, base_dec_latched, pfdw_dec_latched, $time);
+            end
+
+            if ((sample_idx == 0) || (((sample_idx+1) % 100) == 0)) begin
+                $display("[PROGRESS] %0d/1000 base_acc=%0d pfdw_acc=%0d match=%0d mismatch=%0d | cycles base=%0d pfdw=%0d",
+                         sample_idx+1, baseline_correct, pfdw_correct,
+                         match_count, mismatch_count, base_cycles, pfdw_cycles);
+            end
+        end
+
+        $display("");
+        $display("============================================================");
+        $display(" CYCLE / LATENCY COMPARISON");
+        $display(" Measurement origin: rising edge capturing logical pixel[0]");
+        $display(" Clock period       : 10 ps");
+        $display(" V18A cycles        : avg=%0.2f min=%0d max=%0d",
+                 base_cycles_sum / 1000.0, base_cycles_min, base_cycles_max);
+        $display(" PFDW V20 W5 cycles    : avg=%0.2f min=%0d max=%0d",
+                 pfdw_cycles_sum / 1000.0, pfdw_cycles_min, pfdw_cycles_max);
+        $display(" Avg reduction      : %0.2f cycles (%0.2f %%)",
+                 (base_cycles_sum - pfdw_cycles_sum) / 1000.0,
+                 (base_cycles_sum - pfdw_cycles_sum) * 100.0 / base_cycles_sum);
+        $display(" Avg speedup        : %0.3fx",
+                 base_cycles_sum * 1.0 / pfdw_cycles_sum);
+        $display("============================================================");
+
+        $display("");
+        $display("============================================================");
+        $display(" FINAL COMPARISON");
+        $display(" V18A correct    : %0d / 1000  (%0.2f %%)",
+                 baseline_correct, baseline_correct * 100.0 / 1000.0);
+        $display(" PFDW correct     : %0d / 1000  (%0.2f %%)",
+                 pfdw_correct, pfdw_correct * 100.0 / 1000.0);
+        $display(" Decision match   : %0d / 1000  (%0.2f %%)",
+                 match_count, match_count * 100.0 / 1000.0);
+        $display(" Decision mismatch: %0d / 1000", mismatch_count);
+        $display(" X/Z decisions    : %0d", xz_count);
+        $display("============================================================");
+
+        if ((baseline_correct == 970) && (pfdw_correct >= 970) && (xz_count == 0) && (pfdw_cycles_sum <= base_cycles_sum))
+            $display(" RESULT: PASS - baseline, V20 accuracy, X/Z and cycle gates passed.");
+        else
+            $fatal(1, "RESULT: FAIL - baseline, accuracy, X/Z or cycle regression.");
+
+        #20 $finish;
+    end
+
+    // Generous timeout. Both designs run in parallel.
+    initial begin
+        #90000000; // 90 us
+        $fatal(1, "[CYCLE COMPARE V20] TIMEOUT at %0t ps", $time);
+    end
+
+endmodule

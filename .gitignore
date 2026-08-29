@@ -17,8 +17,17 @@
 *.tmp
 *.bak
 *~
+__pycache__/
+*.pyc
 
 # OS / editor
 .DS_Store
 Thumbs.db
 .vscode/
+
+# FAR-PFDW generated run products
+far_pfdw_v20/build/
+far_pfdw_v20/logs/
+far_pfdw_v20/reports/
+far_pfdw_v20/results/
+far_pfdw_v20/objects/
