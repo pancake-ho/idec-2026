@@ -1,0 +1,25 @@
+==================================================
+FAR-PFDW V18A vs V19 full ORFS PPA A/B
+==================================================
+JOB_ID       : 138241
+NODE         : moana-r4
+CPUS         : 16
+REPO_ROOT    : /data/surt321/repos/idec
+LOCAL_ROOT   : /local_datasets/surt321/orfs_ppa_138241
+ORFS_COMMIT  : a5ff7ef7dac4338e6e5fad7710b85fc6c8f3503c
+
+[Copy pinned runtime and native tools to local disk]
+/local_datasets/surt321/orfs_ppa_138241/orfs.sif: OK
+/local_datasets/surt321/orfs_ppa_138241/orfs_native.tar.gz: OK
+
+[Clone pinned ORFS source without build submodules]
+
+[Install reusable native tool archive]
+TOOLS_INSTALL_SOURCE=/local_datasets/surt321/orfs_ppa_138241/native_tools_stage/install
+
+[Copy design repository to node-local workspace]
+
+[Validate relocated native tools and run full A/B flow]
+
+JOB_EXIT_CODE=1
+LOCAL_ROOT=/local_datasets/surt321/orfs_ppa_138241

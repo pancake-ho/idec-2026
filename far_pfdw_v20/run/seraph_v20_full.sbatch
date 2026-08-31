@@ -25,6 +25,26 @@ readonly TOOLS_SHA256="399ce2747f6aca4af0e46ca40bd9d5a233314e599b84262ab4bbdcda3
 readonly LOCAL_SIF="${LOCAL_ROOT}/orfs.sif"
 readonly LOCAL_TOOLS="${LOCAL_ROOT}/native_tools.tar.gz"
 
+require_executable() {
+  local path="$1"
+  if [[ ! -x "${path}" ]]; then
+    echo "ERROR: required executable is missing or not executable: ${path}" >&2
+    ls -l "${path}" 2>/dev/null || true
+    exit 4
+  fi
+  echo "HOST_EXECUTABLE_OK=${path}"
+}
+
+require_nonempty_file() {
+  local path="$1"
+  if [[ ! -s "${path}" ]]; then
+    echo "ERROR: required file is missing or empty: ${path}" >&2
+    ls -l "${path}" 2>/dev/null || true
+    exit 4
+  fi
+  echo "HOST_FILE_OK=${path}"
+}
+
 sync_artifacts() {
   local source="${LOCAL_REPO}/${PACKAGE_REL}"
   local destination="${REPO_ROOT}/${PACKAGE_REL}"
@@ -68,7 +88,12 @@ git clone --no-recurse-submodules \
   https://github.com/The-OpenROAD-Project/OpenROAD-flow-scripts.git \
   "${ORFS_ROOT}"
 git -C "${ORFS_ROOT}" checkout --detach "${ORFS_COMMIT}"
-test "$(git -C "${ORFS_ROOT}" rev-parse HEAD)" = "${ORFS_COMMIT}"
+actual_orfs_commit="$(git -C "${ORFS_ROOT}" rev-parse HEAD)"
+echo "ACTUAL_ORFS_COMMIT=${actual_orfs_commit}"
+if [[ "${actual_orfs_commit}" != "${ORFS_COMMIT}" ]]; then
+  echo "ERROR: ORFS commit mismatch." >&2
+  exit 4
+fi
 
 readonly TOOLS_STAGE="${LOCAL_ROOT}/native_tools"
 mkdir -p "${TOOLS_STAGE}" "${ORFS_ROOT}/tools/install"
@@ -83,9 +108,10 @@ else
 fi
 rsync -a "${tools_source}/" "${ORFS_ROOT}/tools/install/"
 mkdir -p "${ORFS_ROOT}/dependencies"
-test -x "${ORFS_ROOT}/tools/install/OpenROAD/bin/openroad"
-test -x "${ORFS_ROOT}/tools/install/yosys/bin/yosys"
-test -s "${ORFS_ROOT}/tools/install/yosys/share/yosys/plugins/slang.so"
+require_executable "${ORFS_ROOT}/tools/install/OpenROAD/bin/openroad"
+require_executable "${ORFS_ROOT}/tools/install/yosys/bin/yosys"
+require_nonempty_file "${ORFS_ROOT}/tools/install/yosys/share/yosys/plugins/slang.so"
+echo "HOST_NATIVE_TOOLS_STAGE=PASS"
 
 rsync -a \
   --exclude='/.git/' \
@@ -96,6 +122,9 @@ rsync -a \
   --exclude='/far_pfdw_v20/results/' \
   --exclude='/far_pfdw_v20/objects/' \
   "${REPO_ROOT}/" "${LOCAL_REPO}/"
+require_nonempty_file "${LOCAL_REPO}/${PACKAGE_REL}/scripts/check_source.sh"
+require_nonempty_file "${LOCAL_REPO}/${PACKAGE_REL}/scripts/run_orfs_ab.sh"
+echo "LOCAL_REPO_STAGE=PASS"
 
 export SINGULARITYENV_ORFS_ROOT="${ORFS_ROOT}"
 export SINGULARITYENV_LOCAL_REPO="${LOCAL_REPO}"
@@ -107,18 +136,44 @@ singularity exec --cleanenv \
   --bind /local_datasets:/local_datasets \
   "${LOCAL_SIF}" /usr/bin/bash -s <<'CONTAINER_EOF'
 set -euo pipefail
+echo "CONTAINER_STAGE=ENTERED"
 mkdir -p "${ORFS_ROOT}/dependencies" "${TMPDIR}"
-source "${ORFS_ROOT}/dev_env.sh"
+if ! source "${ORFS_ROOT}/dev_env.sh"; then
+  echo "ERROR: ORFS dev_env.sh failed." >&2
+  exit 5
+fi
 export ORFS_FLOW_DIR="${ORFS_ROOT}/flow"
 export ORFS_NUM_CORES
 export ORFS_AB_PARALLEL=1
 export OMP_NUM_THREADS=8
+export PATH="${ORFS_ROOT}/tools/install/OpenROAD/bin:${ORFS_ROOT}/tools/install/yosys/bin:${PATH}"
 export LD_LIBRARY_PATH="${ORFS_ROOT}/tools/install/OpenROAD/lib:${ORFS_ROOT}/tools/install/yosys/lib:${LD_LIBRARY_PATH:-}"
+hash -r
 
-test "$(readlink -f "$(command -v openroad)")" = "${ORFS_ROOT}/tools/install/OpenROAD/bin/openroad"
-openroad -version
-yosys -V
-yosys -m slang -p 'slang_version'
+expected_openroad="${ORFS_ROOT}/tools/install/OpenROAD/bin/openroad"
+expected_yosys="${ORFS_ROOT}/tools/install/yosys/bin/yosys"
+slang_plugin="${ORFS_ROOT}/tools/install/yosys/share/yosys/plugins/slang.so"
+actual_openroad="$(readlink -f "$(command -v openroad || true)")"
+actual_yosys="$(readlink -f "$(command -v yosys || true)")"
+echo "CONTAINER_PATH=${PATH}"
+echo "ACTUAL_OPENROAD=${actual_openroad}"
+echo "EXPECTED_OPENROAD=${expected_openroad}"
+echo "ACTUAL_YOSYS=${actual_yosys}"
+echo "EXPECTED_YOSYS=${expected_yosys}"
+ls -l "${expected_openroad}" "${expected_yosys}" "${slang_plugin}"
+if [[ "${actual_openroad}" != "${expected_openroad}" ]]; then
+  echo "ERROR: OpenROAD path mismatch." >&2
+  exit 5
+fi
+if [[ "${actual_yosys}" != "${expected_yosys}" ]]; then
+  echo "ERROR: Yosys path mismatch." >&2
+  exit 5
+fi
+"${expected_openroad}" -version
+"${expected_yosys}" -V
+"${expected_yosys}" -m "${slang_plugin}" -p 'slang_version'
+"${expected_yosys}" -m slang -p 'slang_version'
+echo "CONTAINER_NATIVE_TOOLS_STAGE=PASS"
 
 cd "${LOCAL_REPO}"
 bash far_pfdw_v20/scripts/check_source.sh

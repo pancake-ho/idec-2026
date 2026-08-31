@@ -1,0 +1,247 @@
+JOB_ID=138488
+NODE=moana-r1
+CPUS=16
+REPO_ROOT=/data/surt321/repos/idec
+LOCAL_ROOT=/local_datasets/surt321/pfdw_v20_138488
+ORFS_COMMIT=a5ff7ef7dac4338e6e5fad7710b85fc6c8f3503c
+/local_datasets/surt321/pfdw_v20_138488/orfs.sif: OK
+/local_datasets/surt321/pfdw_v20_138488/native_tools.tar.gz: OK
+ACTUAL_ORFS_COMMIT=a5ff7ef7dac4338e6e5fad7710b85fc6c8f3503c
+HOST_EXECUTABLE_OK=/local_datasets/surt321/pfdw_v20_138488/OpenROAD-flow-scripts/tools/install/OpenROAD/bin/openroad
+HOST_EXECUTABLE_OK=/local_datasets/surt321/pfdw_v20_138488/OpenROAD-flow-scripts/tools/install/yosys/bin/yosys
+HOST_FILE_OK=/local_datasets/surt321/pfdw_v20_138488/OpenROAD-flow-scripts/tools/install/yosys/share/yosys/plugins/slang.so
+HOST_NATIVE_TOOLS_STAGE=PASS
+HOST_FILE_OK=/local_datasets/surt321/pfdw_v20_138488/idec/far_pfdw_v20/scripts/check_source.sh
+HOST_FILE_OK=/local_datasets/surt321/pfdw_v20_138488/idec/far_pfdw_v20/scripts/run_orfs_ab.sh
+LOCAL_REPO_STAGE=PASS
+CONTAINER_STAGE=ENTERED
+CONTAINER_PATH=/local_datasets/surt321/pfdw_v20_138488/OpenROAD-flow-scripts/tools/install/OpenROAD/bin:/local_datasets/surt321/pfdw_v20_138488/OpenROAD-flow-scripts/tools/install/yosys/bin:/local_datasets/surt321/pfdw_v20_138488/OpenROAD-flow-scripts/dependencies/bin:/usr/local/bin/wrapped-cc:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+ACTUAL_OPENROAD=/local_datasets/surt321/pfdw_v20_138488/OpenROAD-flow-scripts/tools/install/OpenROAD/bin/openroad
+EXPECTED_OPENROAD=/local_datasets/surt321/pfdw_v20_138488/OpenROAD-flow-scripts/tools/install/OpenROAD/bin/openroad
+ACTUAL_YOSYS=/local_datasets/surt321/pfdw_v20_138488/OpenROAD-flow-scripts/tools/install/yosys/bin/yosys
+EXPECTED_YOSYS=/local_datasets/surt321/pfdw_v20_138488/OpenROAD-flow-scripts/tools/install/yosys/bin/yosys
+-rwxr-xr-x 1 surt321 surt321 118092448 Aug 29 08:36 /local_datasets/surt321/pfdw_v20_138488/OpenROAD-flow-scripts/tools/install/OpenROAD/bin/openroad
+-rwxr-xr-x 1 surt321 surt321  29277816 Aug 29 08:49 /local_datasets/surt321/pfdw_v20_138488/OpenROAD-flow-scripts/tools/install/yosys/bin/yosys
+-rw-r--r-- 1 surt321 surt321   9796128 Aug 29 08:52 /local_datasets/surt321/pfdw_v20_138488/OpenROAD-flow-scripts/tools/install/yosys/share/yosys/plugins/slang.so
+26Q3-318-g6b9d7fb806 
+Yosys 0.64 (git sha1 8449dd470, g++ 11.4.0-1ubuntu1~22.04.3 -O2 -march=x86-64-v3 -mtune=generic -fPIC -O3) [the-openroad-project/yosys]
+
+ /----------------------------------------------------------------------------\
+ |  yosys -- Yosys Open SYnthesis Suite                                       |
+ |  Copyright (C) 2012 - 2026  Claire Xenia Wolf <claire@yosyshq.com>         |
+ |  Distributed under an ISC-like license, type "license" to see terms        |
+ \----------------------------------------------------------------------------/
+ Yosys 0.64 (git sha1 8449dd470, g++ 11.4.0-1ubuntu1~22.04.3 -O2 -march=x86-64-v3 -mtune=generic -fPIC -O3) [the-openroad-project/yosys]
+
+-- Running command `slang_version' --
+yosys-slang revision unknown
+slang revision unknown
+
+End of script. Logfile hash: 332d7b6114, time: 0.00s, user: 0.00s, system: 0.00s, MEM: 19.63 MB peak
+Yosys 0.64 (git sha1 8449dd470, g++ 11.4.0-1ubuntu1~22.04.3 -O2 -march=x86-64-v3 -mtune=generic -fPIC -O3) [the-openroad-project/yosys]
+Time spent: 99% 1x slang_version (0 sec), 0% 0x id_gc (0 sec)
+
+ /----------------------------------------------------------------------------\
+ |  yosys -- Yosys Open SYnthesis Suite                                       |
+ |  Copyright (C) 2012 - 2026  Claire Xenia Wolf <claire@yosyshq.com>         |
+ |  Distributed under an ISC-like license, type "license" to see terms        |
+ \----------------------------------------------------------------------------/
+ Yosys 0.64 (git sha1 8449dd470, g++ 11.4.0-1ubuntu1~22.04.3 -O2 -march=x86-64-v3 -mtune=generic -fPIC -O3) [the-openroad-project/yosys]
+
+-- Running command `slang_version' --
+yosys-slang revision unknown
+slang revision unknown
+
+End of script. Logfile hash: 332d7b6114, time: 0.00s, user: 0.00s, system: 0.00s, MEM: 19.57 MB peak
+Yosys 0.64 (git sha1 8449dd470, g++ 11.4.0-1ubuntu1~22.04.3 -O2 -march=x86-64-v3 -mtune=generic -fPIC -O3) [the-openroad-project/yosys]
+Time spent: 99% 1x slang_version (0 sec), 0% 0x id_gc (0 sec)
+CONTAINER_NATIVE_TOOLS_STAGE=PASS
+Booth reference checks: PASS (778720 operand pairs)
+W5 quantizer checks: PASS (256 signed-int8 values x 3 modes)
+HDL structural checks: PASS (9 files)
+Python/shell/generated-source checks: PASS
+NOTE: Vivado RTL and ORFS gates still require their target environments.
+Baseline: 970/1000
+W8 ('floor', 'floor', 'floor'): correct=970/1000 match=1000/1000 gate=PASS
+W7 ('floor', 'floor', 'floor'): correct=980/1000 match=970/1000 gate=PASS
+W6 ('floor', 'even', 'floor'): correct=980/1000 match=970/1000 gate=PASS
+W5 ('floor', 'trunc', 'even'): correct=980/1000 match=950/1000 gate=PASS
+W4 ('trunc', 'even', 'even'): correct=950/1000 match=950/1000 gate=FAIL
+SELECTED: W5 shift=3 modes=(floor,trunc,even)
+CSV: /local_datasets/surt321/pfdw_v20_138488/idec/far_pfdw_v20/build/search/pow2_mp_search.csv
+JSON: /local_datasets/surt321/pfdw_v20_138488/idec/far_pfdw_v20/build/search/pow2_mp_search.json
+far_pfdw_v20/rtl/pfdw_pipe49_booth_engine_v20_w5.sv
+far_pfdw_v20/rtl/chip_pfdw_fc_v20_pow2.sv
+far_pfdw_v20/rtl/chip_v20_pow2_top.v
+far_pfdw_v20/tb/top_tb_v20_1000.sv
+far_pfdw_v20/tb/top_tb_v20_vs_v18a_1000.sv
+far_pfdw_v20/tb/top_tb_cycle_v20_vs_v18a.sv
+far_pfdw_v20/tb/top_tb_v20_vs_baseline_1000.sv
+far_pfdw_v20/tb/top_tb_cycle_v20_vs_baseline.sv
+far_pfdw_v20/tb/top_tb_gate_v20_1000.sv
+a5ff7ef7dac4338e6e5fad7710b85fc6c8f3503c
+START chip_v20_pow2: NUM_CORES=8, log=/local_datasets/surt321/pfdw_v20_138488/idec/far_pfdw_v20/build/orfs/chip_v20_pow2.log
+START chip_v18a: NUM_CORES=8, log=/local_datasets/surt321/pfdw_v20_138488/idec/far_pfdw_v20/build/orfs/chip_v18a.log
+DONE  chip_v18a
+Report metrics stage 6, finish...
+
+==========================================================================
+finish report_design_area
+--------------------------------------------------------------------------
+Design area 18280 um^2 43% utilization.
+[WARNING GUI-0076] QStandardPaths: XDG_RUNTIME_DIR not set, defaulting to '/local_datasets/surt321/pfdw_v20_138488/tmp/runtime-surt321'
+[WARNING GUI-0066] Heat map "IR Drop" has not been populated with data.
+[WARNING GUI-0066] Heat map "Routing Congestion" has not been populated with data.
+Elapsed time: 9:45.96[h:]min:sec. CPU time: user 667.77 sys 21.61 (117%). Peak memory: 4425044KB.
+Log                       Ext     Elapsed/s Peak Memory/MB sha1sum result [0:20)
+6_report                                585           4321                  N/A
+cp ./results/asap7/chip_v18a_v20_ab/base/5_route.sdc ./results/asap7/chip_v18a_v20_ab/base/6_final.sdc
+cp /local_datasets/surt321/pfdw_v20_138488/OpenROAD-flow-scripts/flow/platforms/asap7/lef/asap7_tech_1x_201209.lef ./objects/asap7/chip_v18a_v20_ab/base/klayout_tech.lef
+/usr/bin/python3 /local_datasets/surt321/pfdw_v20_138488/OpenROAD-flow-scripts/flow/util/generate_klayout_tech.py \
+	--template /local_datasets/surt321/pfdw_v20_138488/OpenROAD-flow-scripts/flow/platforms/asap7/KLayout/asap7.lyt \
+	--output ./objects/asap7/chip_v18a_v20_ab/base/klayout.lyt \
+	--lef-files ./objects/asap7/chip_v18a_v20_ab/base/klayout_tech.lef /local_datasets/surt321/pfdw_v20_138488/OpenROAD-flow-scripts/flow/platforms/asap7/lef/asap7sc7p5t_28_R_1x_220121a.lef   \
+	--map-files 
+/usr/bin/python3 /local_datasets/surt321/pfdw_v20_138488/OpenROAD-flow-scripts/flow/scripts/run_command.py --log /local_datasets/surt321/pfdw_v20_138488/idec/far_pfdw_v20/logs/asap7/chip_v18a_v20_ab/base/6_1_merge.log --tee -- \
+        /local_datasets/surt321/pfdw_v20_138488/OpenROAD-flow-scripts/flow/scripts/klayout.sh -zz -rd design_name=chip \
+        -rd in_def=./results/asap7/chip_v18a_v20_ab/base/6_final.def \
+        -rd in_files="/local_datasets/surt321/pfdw_v20_138488/OpenROAD-flow-scripts/flow/platforms/asap7/gds/asap7sc7p5t_28_R_220121a.gds  " \
+        -rd seal_file="" \
+        -rd out_file=./results/asap7/chip_v18a_v20_ab/base/6_1_merged.gds \
+        -rd tech_file=./objects/asap7/chip_v18a_v20_ab/base/klayout.lyt \
+        -rd layer_map= \
+        -r /local_datasets/surt321/pfdw_v20_138488/OpenROAD-flow-scripts/flow/util/def2stream.py
+KLayout 0.30.7
+Warning: DEF UNITS does not match reader DBU (DEF UNITS is 1000 and corresponds to a DBU of 0.001, but reader DBU is set to 0.00025) (line=5, cell=, file=6_final.def)
+[INFO] Reporting cells prior to loading DEF ...
+	/local_datasets/surt321/pfdw_v20_138488/OpenROAD-flow-scripts/flow/platforms/asap7/gds/asap7sc7p5t_28_R_220121a.gds
+[INFO] GDS_ALLOW_EMPTY=fakeram.*
+[INFO] All LEF cells have matching GDS/OAS cells
+[INFO] No orphan cells in the final layout
+Elapsed time: 0:36.27[h:]min:sec. CPU time: user 34.81 sys 1.39 (99%). Peak memory: 1268028KB.
+cp results/asap7/chip_v18a_v20_ab/base/6_1_merged.gds results/asap7/chip_v18a_v20_ab/base/6_final.gds
+./logs/asap7/chip_v18a_v20_ab/base
+Log                       Ext     Elapsed/s Peak Memory/MB sha1sum result [0:20)
+1_1_yosys_canonicalize    .rtlil          7            152 2140aed1071a4a2b4415
+1_2_yosys                 .v            793           6692 3110d0409c4477ac6f18
+1_2_yosys                 .sdc                             2c30fb08fb2224bdcd4e
+1_synth                   .odb           11            550 05270bf486ae2176f6af
+1_synth                   .sdc                             5aef8627137aef6c47ae
+2_1_floorplan             .odb          107            795 36a90f02ba9076c599bf
+2_1_floorplan             .sdc                             5aef8627137aef6c47ae
+2_2_floorplan_macro       .odb            7            435 36a90f02ba9076c599bf
+2_3_floorplan_tapcell     .odb            6            350 fb65dba9df75599e200a
+2_4_floorplan_pdn         .odb           11            460 6424d7228711fbb31339
+3_1_place_gp_skip_io      .odb           67            676 27bb1e6106d6aadbf8fb
+3_2_place_iop             .odb           11            458 fec2abc68f8aebcde7bf
+3_3_place_gp              .odb          721           1962 495292846487ffb9b2c7
+3_4_place_resized         .odb          291            976 4864c47536f0fecdd0be
+3_5_place_dp              .odb          330           1322 dc62d929e8d2b01b912f
+4_1_cts                   .odb          683           1547 20bb044a7e3f12c47abb
+5_1_grt                   .odb         1959           3657 ee51a9fa71293fec4276
+5_1_grt                   .sdc                             bcc72ad08298ee8aeec6
+5_2_route                 .odb         6830          20533 177830032f69b1e3c0a6
+5_3_fillcell              .odb           17            974 d0d257b4133117c019d1
+6_1_fill                  .odb            9            657 d0d257b4133117c019d1
+6_1_fill                  .sdc                             bcc72ad08298ee8aeec6
+6_1_merge                                36           1238                  N/A
+6_report                                585           4321                  N/A
+Total                                 12481          20533                     
+mkdir -p ./reports/asap7/chip_v18a_v20_ab/base
+echo /local_datasets/surt321/pfdw_v20_138488/idec/far_pfdw_v20/orfs/chip_v18a > ./reports/asap7/chip_v18a_v20_ab/base/design-dir.txt
+/usr/bin/python3 /local_datasets/surt321/pfdw_v20_138488/OpenROAD-flow-scripts/flow/util/genMetrics.py -d chip_v18a_v20_ab \
+    -p asap7 \
+    -v base \
+    --logs ./logs/asap7/chip_v18a_v20_ab/base \
+    --reports ./reports/asap7/chip_v18a_v20_ab/base \
+    --results ./results/asap7/chip_v18a_v20_ab/base \
+    -o ./reports/asap7/chip_v18a_v20_ab/base/metadata.json 2>&1 \
+    | tee /local_datasets/surt321/pfdw_v20_138488/idec/far_pfdw_v20/reports/asap7/chip_v18a_v20_ab/base/metadata-generate.log
+[WARN] Overwriting Tag synth__runtime__total
+[WARN] Overwriting Tag synth__cpu__total
+[WARN] Overwriting Tag synth__mem__peak
+[WARN] Overwriting Tag finish__runtime__total
+[WARN] Overwriting Tag finish__cpu__total
+[WARN] Overwriting Tag finish__mem__peak
+[INFO DRT-0036] V8 guide region query size = 0.
+[INFO DRT-0036] M9 guide region query size = 0.
+[INFO DRT-0036] V9 guide region query size = 0.
+[INFO DRT-0036] Pad guide region query size = 0.
+[INFO DRT-0179] Init gr pin query.
+[INFO DRT-0267] cpu time = 00:00:16, elapsed time = 00:00:05, memory = 2036.16 (MB), peak = 2036.16 (MB)
+[INFO DRT-0245] skipped writing guide updates to database.
+[INFO DRT-0181] Start track assignment.
+[INFO DRT-0184] Done with 642840 vertical wires in 8 frboxes and 414809 horizontal wires in 8 frboxes.
+[INFO DRT-0186] Done with 75940 vertical wires in 8 frboxes and 120650 horizontal wires in 8 frboxes.
+[INFO DRT-0182] Complete track assignment.
+[INFO DRT-0267] cpu time = 00:03:59, elapsed time = 00:00:50, memory = 3919.13 (MB), peak = 4230.64 (MB)
+[INFO DRT-0187] Start routing data preparation.
+[INFO DRT-0267] cpu time = 00:00:02, elapsed time = 00:00:02, memory = 3973.27 (MB), peak = 4230.64 (MB)
+[INFO DRT-0194] Start detail routing.
+[INFO DRT-0195] Start 0th optimization iteration.
+    Completing 10% with 0 violations.
+    elapsed time = 00:02:57, memory = 7697.89 (MB).
+    Completing 20% with 0 violations.
+    elapsed time = 00:05:36, memory = 12725.80 (MB).
+    Completing 30% with 7817 violations.
+    elapsed time = 00:07:28, memory = 14229.19 (MB).
+    Completing 40% with 7817 violations.
+    elapsed time = 00:11:19, memory = 14233.82 (MB).
+    Completing 50% with 7817 violations.
+    elapsed time = 00:13:19, memory = 15733.65 (MB).
+    Completing 60% with 15915 violations.
+    elapsed time = 00:17:08, memory = 16079.75 (MB).
+    Completing 70% with 15915 violations.
+    elapsed time = 00:20:47, memory = 14873.05 (MB).
+    Completing 80% with 23462 violations.
+    elapsed time = 00:23:56, memory = 15026.04 (MB).
+    Completing 90% with 23462 violations.
+    elapsed time = 00:28:48, memory = 13135.42 (MB).
+    Completing 100% with 31003 violations.
+    elapsed time = 00:33:11, memory = 17285.19 (MB).
+[INFO DRT-0199]   Number of violations = 39697.
+Viol/Layer          M1     V1     M2     V2     M3     V3     M4     V4     M5     V5     M6     V6     M7
+CutSpcTbl            0      0      0      0      0    243      0    111      0     47      0     50      0
+EOL                  0      0   2558      0    546      0    293      0      7      0      4      0      0
+Metal Spacing     2800      0   1018      0   2191      0    260      0     13      0     69      0      1
+Recheck             12      0   3824      0   2467      0   1272      0    717      0    344      0     58
+Short              450      6   3163     77    657     32    333     33    104     35    163      7      2
+eolKeepOut           0      0  12648      0   1833      0   1192      0     36      0     21      0      0
+[INFO DRT-0267] cpu time = 04:04:41, elapsed time = 00:33:25, memory = 17278.61 (MB), peak = 17302.27 (MB)
+Total wire length = 1031374 um.
+Total wire length on LAYER M1 = 0 um.
+Total wire length on LAYER M2 = 251495 um.
+Total wire length on LAYER M3 = 344997 um.
+Total wire length on LAYER M4 = 250793 um.
+Total wire length on LAYER M5 = 98342 um.
+Total wire length on LAYER M6 = 66231 um.
+Total wire length on LAYER M7 = 19513 um.
+Total wire length on LAYER M8 = 0 um.
+Total wire length on LAYER M9 = 0 um.
+Total wire length on LAYER Pad = 0 um.
+Total number of vias = 1635932.
+Up-via summary (total 1635932):
+
+------------------
+ Active          0
+     M1     484118
+     M2     866992
+     M3     211546
+     M4      48732
+     M5      15744
+     M6       8800
+     M7          0
+     M8          0
+     M9          0
+------------------
+       1635932
+
+
+[INFO DRT-0195] Start 1st optimization iteration.
+    Completing 10% with 39697 violations.
+    elapsed time = 00:03:34, memory = 17655.09 (MB).
+Elapsed time: 52:39.06[h:]min:sec. CPU time: user 23395.75 sys 136.37 (744%). Peak memory: 18297740KB.
+make[1]: *** [/local_datasets/surt321/pfdw_v20_138488/OpenROAD-flow-scripts/flow/Makefile:552: do-5_2_route] Error 247
+make: *** [/local_datasets/surt321/pfdw_v20_138488/OpenROAD-flow-scripts/flow/Makefile:552: results/asap7/chip_v20_pow2/base/5_2_route.odb] Error 2
+JOB_EXIT_CODE=1
+LOCAL_ROOT=/local_datasets/surt321/pfdw_v20_138488

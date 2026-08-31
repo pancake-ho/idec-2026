@@ -1,0 +1,102 @@
+diff --git a/far_pfdw_v20/scripts/check_source.sh b/far_pfdw_v20/scripts/check_source.sh
+index 91bf829..aa45070 100755
+--- a/far_pfdw_v20/scripts/check_source.sh
++++ b/far_pfdw_v20/scripts/check_source.sh
+@@ -77,6 +77,7 @@ for path in hdl:
+ 
+ engine = (root / "rtl/pfdw_pipe49_booth_engine_v20_w5.sv").read_text()
+ chip = (root / "rtl/chip_pfdw_fc_v20_pow2.sv").read_text()
++standalone_tb = (root / "tb/top_tb_v20_1000.sv").read_text()
+ assert "input  logic signed [4:0]  conv_kernel" in engine
+ assert "input  logic signed [4:0]  fc_b" in engine
+ assert "lane_bw = 5" in engine and "lane_bw = 9" in engine
+@@ -86,6 +87,10 @@ assert "quant_trunc5" in chip
+ assert "quant_even5" in chip
+ assert "<<< 3" in chip
+ assert not re.search(r"[A-Za-z]:[/\\]", engine + chip)
++assert "far_group_open" not in standalone_tb
++assert "FAR activation fan-out order violation" not in standalone_tb
++for path in sorted(root.glob("tb/*.sv")):
++    assert "V19 FAR" not in path.read_text(), path
+ print(f"HDL structural checks: PASS ({len(hdl)} files)")
+ PY
+ 
+diff --git a/far_pfdw_v20/scripts/generate_rtl.py b/far_pfdw_v20/scripts/generate_rtl.py
+index d4fe0e3..5a214bb 100755
+--- a/far_pfdw_v20/scripts/generate_rtl.py
++++ b/far_pfdw_v20/scripts/generate_rtl.py
+@@ -319,6 +319,8 @@ def generate_tb(source_name: str, top_old: str, top_new: str) -> str:
+     text = text.replace("chip_pfdw_fc_v19_far", "chip_pfdw_fc_v20_pow2")
+     text = text.replace("PFDW V19 FAR", "PFDW V20 W5")
+     text = text.replace("PFDW FAR", "PFDW V20 W5")
++    text = text.replace("V18A vs V19 FAR", "V18A vs V20 W5")
++    text = text.replace("CYCLE COMPARE FAR", "CYCLE COMPARE V20")
+     text = text.replace("FAR is decision-identical to V18A for all 1000 images.", "V20 accuracy gate passed.")
+     text = text.replace("All 1000 classification decisions are identical.", "V20 accuracy gate passed.")
+     if "vs_" in top_new:
+@@ -377,6 +379,49 @@ def generate_tb(source_name: str, top_old: str, top_new: str) -> str:
+     if "vs_" in top_new and count != 1:
+         raise RuntimeError(f"{source_name}: comparison gate count={count}")
+     if source_name == "top_tb_far_1000.sv":
++        # The V19 standalone TB enforces FAR's (ic,oc) traversal by requiring
++        # oc=0,1,2 for a fixed activation key.  V20 is deliberately generated
++        # from frozen V18A, whose Conv2 traversal is ic=0,1,2 followed by the
++        # next oc.  Keeping the FAR-only monitor would therefore reject the
++        # correct V18A/V20 schedule before checking a single image.
++        text = replace_once(
++            text,
++            "    // FAR invariant monitor: every convolution activation group must be\n"
++            "    // consumed as oc=0,1,2 with an unchanged layer/pr/pc/ic key.\n"
++            "    reg        far_group_open;\n"
++            "    reg [13:0] far_group_key;\n"
++            "    reg [1:0]  far_last_oc;\n\n",
++            "",
++            "remove V19 FAR-only monitor declarations",
++        )
++        text = replace_once(
++            text,
++            "    always @(posedge clk) begin\n"
++            "        if (!rst_n) begin\n"
++            "            far_group_open <= 1'b0;\n"
++            "            far_group_key  <= 14'd0;\n"
++            "            far_last_oc    <= 2'd0;\n"
++            "        end else if (dut.req_valid && !dut.req_is_fc) begin\n"
++            "            if (dut.req_tag[3:2] == 2'd0) begin\n"
++            "                if (far_group_open)\n"
++            "                    $fatal(1, \"FAR group restarted before oc=2 completed\");\n"
++            "                far_group_open <= 1'b1;\n"
++            "                far_group_key  <= {dut.req_tag[15:4],dut.req_tag[1:0]};\n"
++            "                far_last_oc    <= 2'd0;\n"
++            "            end else begin\n"
++            "                if (!far_group_open ||\n"
++            "                    ({dut.req_tag[15:4],dut.req_tag[1:0]} != far_group_key) ||\n"
++            "                    (dut.req_tag[3:2] != (far_last_oc + 1'b1)))\n"
++            "                    $fatal(1, \"FAR activation fan-out order violation\");\n"
++            "                far_last_oc <= dut.req_tag[3:2];\n"
++            "                if (dut.req_tag[3:2] == 2'd2)\n"
++            "                    far_group_open <= 1'b0;\n"
++            "            end\n"
++            "        end\n"
++            "    end\n\n",
++            "",
++            "remove V19 FAR-only monitor logic",
++        )
+         text = replace_once(
+             text,
+             "    integer fail_count;",
+diff --git a/far_pfdw_v20/scripts/run_orfs_ab.sh b/far_pfdw_v20/scripts/run_orfs_ab.sh
+index bda6ab9..844544f 100755
+--- a/far_pfdw_v20/scripts/run_orfs_ab.sh
++++ b/far_pfdw_v20/scripts/run_orfs_ab.sh
+@@ -76,7 +76,10 @@ rsync -a --include='*/' --include='*.v' --include='*.sv' --exclude='*' \
+   "${stdcell_source}/" "${gate_bundle}/stdcell/"
+ test -s "${gate_bundle}/chip_v20_pow2_final.v"
+ test -n "$(find "${gate_bundle}/stdcell" -type f \( -name '*.v' -o -name '*.sv' \) -print -quit)"
+-sha256sum "${gate_bundle}/chip_v20_pow2_final.v" > "${gate_bundle}/SHA256SUMS"
++(
++  cd "${gate_bundle}"
++  sha256sum chip_v20_pow2_final.v > SHA256SUMS
++)
+ echo "GATE_BUNDLE=${gate_bundle}"
+ 
+ "${package_root}/scripts/ppa_summary.sh"
