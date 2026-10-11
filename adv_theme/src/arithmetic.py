@@ -20,8 +20,9 @@ A = {
 BLOCKS = ((0,0,3,3),(0,3,3,2),(3,0,2,3),(3,3,2,2))
 
 def conv_direct(x,w):
-    x=np.asarray(x,dtype=np.int64);w=np.asarray(w,dtype=np.int64)
-    return np.einsum('ihwkl,oikl->ohw',sliding_window_view(x,(5,5),axis=(1,2)),w)
+    x = np.asarray(x,dtype=np.int64)
+    w = np.asarray(w,dtype=np.int64)
+    return np.einsum('ihwkl,oikl->ohw',sliding_window_view(x, (5,5), axis=(1,2)), w)
 
 def assert_i32(x):
     if np.min(x)<-(1<<31) or np.max(x)>(1<<31)-1:
