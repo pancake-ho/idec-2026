@@ -1,0 +1,13 @@
+{
+  "variant": "final",
+  "shape": "HWC input; OIHW kernel; CHW flatten",
+  "s1": 8,
+  "s2": 9,
+  "rounding": "nearest_even",
+  "weight_words": "byte sign-extended; logical packing is separate",
+  "profiles": [
+    "shared",
+    "avc",
+    "hevc"
+  ]
+}
