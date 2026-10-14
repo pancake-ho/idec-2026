@@ -1,0 +1,19 @@
+{
+  "status": "PASS",
+  "scope": "Four exported-model functional RTL checks; not accuracy/PPA",
+  "weights_sha256": "3ecf10b590485d84dac09e86020d669dff898cd5e72478fed86839dcbefe2329",
+  "data_sha256": "5465a21699063d9c185c2d2ca92d2e275da36cd85605653fd3847d900037b586",
+  "sample_indices": [
+    0,
+    15,
+    31,
+    47
+  ],
+  "profiles": [
+    0,
+    1,
+    2,
+    3
+  ],
+  "stdout": "PASS top case=0 class=2 cycles_start_to_output_plus_hold=17059\nPASS top case=1 class=2 cycles_start_to_output_plus_hold=17059\nPASS top case=2 class=2 cycles_start_to_output_plus_hold=17059\nPASS top case=3 class=2 cycles_start_to_output_plus_hold=17059\nPASS top four images, profiles, stalled input/output, exact logits\n"
+}

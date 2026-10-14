@@ -1,0 +1,24 @@
+{
+  "conv_random_tiles_checked": 5000,
+  "conv_narrow_width_mismatches": 0,
+  "fc_random_vectors_checked": 10000,
+  "fc_sp2_temporal_decomposition": "exact",
+  "fc_score_random_cases_checked": 200000,
+  "fc_score_reduced_formula_mismatches": 0,
+  "notes": [
+    "1000-image search checkpoint 980/1000 was produced by the user's explorer run.",
+    "RTL compilation/simulation must still be run in Vivado/Slang because no SV compiler is available in this sandbox.",
+    "Conv width proof covers all unsigned 8-bit input values 0..255, not only the dataset."
+  ],
+  "embedded_rtl_coefficient_table_mismatches": 0,
+  "lane_product_width_proof": "exact bounds for every independent 8-bit input pixel (0..255)",
+  "p4_p5_width_proof": "conservative interval PASS",
+  "fc_temporal_pass_range_term0": [
+    -31620,
+    28050
+  ],
+  "fc_temporal_pass_range_term1": [
+    -6375,
+    6885
+  ]
+}

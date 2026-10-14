@@ -1,4 +1,7 @@
-// V18A OpenROAD synthesis wrapper. Keeps the official top module name "chip".
+// V25-H OpenROAD/Vivado wrapper.
+// External weight ports are retained for compatibility with the competition
+// baseline interface. V25-H is a fixed-model accelerator: searched transformed
+// coefficients are embedded inside pfdw_pipe49_shift_engine_v25h.
 module chip(
     input clk,
     input rst_n,
@@ -25,7 +28,7 @@ module chip(
     input [0:3839] w_fc,
     input [0:79]   b_fc
 );
-    chip_pfdw_fc_v18a u_v18a (
+    chip_pfdw_fc_v25h u_v25h (
         .clk(clk), .rst_n(rst_n), .data_in(data_in),
         .decision(decision), .valid_out_6(valid_out_6),
         .w_11(w_11), .w_12(w_12), .w_13(w_13), .b_1(b_1), .b_2(b_2),

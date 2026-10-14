@@ -1,0 +1,15 @@
+{
+  "wbits_c1": 5,
+  "wbits_c2": 6,
+  "wbits_fc": 6,
+  "abits_f1": 8,
+  "abits_f2": 8,
+  "code_c1": "pot1",
+  "code_c2": "pot1",
+  "code_fc": "sp2",
+  "prune_thr_c1": 16,
+  "prune_thr_c2": 8,
+  "prune_thr_fc": 8,
+  "c1_mask": 6,
+  "c2_mask": 7
+}

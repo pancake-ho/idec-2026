@@ -1,0 +1,15 @@
+{
+  "status": "PASS",
+  "engines": [
+    "direct",
+    "pfdw"
+  ],
+  "checks": [
+    "prepare_flow input generation",
+    "Icarus top elaboration"
+  ],
+  "weights": "SYNTHETIC_RANDOM_FIXTURE",
+  "synthesis": "NOT_RUN",
+  "place_and_route": "NOT_RUN",
+  "ppa": "NOT_MEASURED"
+}

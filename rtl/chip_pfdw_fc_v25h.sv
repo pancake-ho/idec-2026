@@ -1,28 +1,33 @@
+// =============================================================================
+// V25-H controller: multiplierless fixed-model PFDW accelerator
+//
+// Search point: W566 / A88 / C(pot1,pot1,sp2) / T(16,8,8) / M67.
+//   * Conv1: original output channel 0 removed; original channels 1/2 kept.
+//   * Conv2: all three output channels kept, but only the two surviving Conv1
+//            channels are consumed.
+//   * Conv1/Conv2 transformed coefficients use single signed powers of two.
+//   * FC SP2 coefficients are evaluated as two temporal PoT1 passes.
+//   * Post-pool feature maps are stored at 8 bits.
+//   * External trained-weight ports are retained only for interface compatibility;
+//     this fixed-model implementation embeds the searched coefficients. Bias ports
+//     remain live inputs.
+//
+// The controller preserves the V24 streaming/overlap architecture where useful,
+// while adapting request counts, tags and writeback to the pruned two-channel
+// Conv1 representation.
+// =============================================================================
 `timescale 1ps/1ps
 
-// =============================================================================
-// PFDW V18A Booth-Compacted V14 Dataflow
+// Architecture notes:
+//   - A persistent 6x6 Conv1 sliding window avoids a wide dynamic line-buffer mux.
+//   - Conv1 has two physical output channels and Conv2 consumes two input channels.
+//   - Conv1/Conv2 share the 49-lane fixed-coefficient shift engine.
+//   - Conv1/Conv2 overlap is retained; FC begins after all 48 fmap2 values commit.
+//   - FC uses two temporal passes per class to realize SP2 without per-lane adders.
+//   - The FC final score uses an exact reduced-width bias/carry formulation to avoid
+//     the V24 external-bias -> 20-bit-adder -> argmax critical path.
 //
-// Changes from V6:
-//   1) Adds a persistent 6x6 Conv1 sliding-window register. Conv1 requests no
-//      longer select 36 pixels through a dynamic 7x28 line-buffer mux.
-//   2) Horizontal stride-2 motion reuses four of six columns and fetches only
-//      two new columns (12 bytes) after output-channel 2.
-//   3) Row-start windows are loaded exactly when the final required input pixel
-//      (bottom row, column 5) is captured, so normal Conv1 issue timing is kept.
-//   4) Keeps V6's 7-row fmap1 ring, C1/C2 overlap, writeback pipelines,
-//      range-shaped 49-lane engine and 48-lane FC.
-//   5) Adds mode-aware operand isolation in the shared engine: pipeline stages
-//      continue to hold on invalid cycles and FC suppresses unused lane 48.
-//
-// Sliding-window timing intent:
-//   V6's critical path started at c1_issue_pc and passed through dynamic
-//   line-buffer column selection into the engine P0 tile register. V6 places a
-//   local 6x6 window between those structures. The request path is therefore
-//   fixed wiring from c1_window to P0; line-buffer accesses happen only while
-//   loading the row-start window or the two entering columns after each tile.
-// =============================================================================
-module chip_pfdw_fc_v18a (
+module chip_pfdw_fc_v25h (
     input  logic clk,
     input  logic rst_n,
     input  logic [7:0] data_in,
@@ -64,21 +69,22 @@ module chip_pfdw_fc_v18a (
 
     // Conv1 local 6x6 sliding window.
     // The engine sees only this register bank, not a dynamic 7x28 column mux.
-    logic signed [11:0] c1_window [0:5][0:5];
+    logic        [7:0]  c1_window [0:5][0:5];
     logic               c1_window_valid;
     logic [4:0]         c1_new_col;  // two entering columns for next stride-2 tile
 
     // Pool outputs. V6 retains only seven logical fmap1 rows at a time.
-    // 3 channels x 7 rows x 12 cols x 12 bits = 3024 bits (vs. 5184 bits V4).
-    logic signed [11:0] fmap1_ring [0:2][0:6][0:11];
-    logic signed [11:0] fmap2 [0:2][0:3][0:3];
+    // V25-H stores post-ReLU pooled values directly as unsigned 8-bit data.
+    // Conv1 keeps two physical channels: 2 x 7 x 12 x 8 = 1344 payload bits.
+    logic        [7:0] fmap1_ring [0:1][0:6][0:11];
+    logic        [7:0] fmap2 [0:2][0:3][0:3];
 
     // -------------------------------------------------------------------------
     // Conv1 progress.
     // c1_base_slot = (2*c1_issue_pr) mod 7, maintained incrementally.
     // -------------------------------------------------------------------------
     logic [3:0] c1_issue_pr, c1_issue_pc;
-    logic [1:0] c1_issue_oc;
+    logic       c1_issue_oc;
     logic [2:0] c1_base_slot;
     logic [8:0] c1_issue_count;
     logic [8:0] c1_commit_count;
@@ -88,12 +94,13 @@ module chip_pfdw_fc_v18a (
     logic c1_wb_valid;
     logic [2:0] c1_wb_slot;
     logic [3:0] c1_wb_pc;
-    logic [1:0] c1_wb_oc;
+    logic       c1_wb_oc;
     logic signed [11:0] c1_wb_q00, c1_wb_q01, c1_wb_q10, c1_wb_q11;
 
     // Conv2 progress.
     logic [1:0] c2_issue_pr, c2_issue_pc;
-    logic [1:0] c2_issue_oc, c2_issue_ic;
+    logic [1:0] c2_issue_oc;
+    logic       c2_issue_ic;
     // Physical ring slot corresponding to logical Conv2 window start row
     // (2*c2_issue_pr) mod 7. Updated only when Conv2 advances to next row.
     logic [2:0] c2_base_slot;
@@ -111,49 +118,28 @@ module chip_pfdw_fc_v18a (
     logic signed [11:0] c2_wb1_q00, c2_wb1_q01, c2_wb1_q10, c2_wb1_q11;
     logic [5:0] c2_commit_count;
 
-    // FC progress: one 48-term request per class.
+    // FC progress: two temporal PoT1 requests per class implement SP2 exactly.
     logic [3:0] fc_issue_class;
-    logic [3:0] fc_issue_count;
+    logic [4:0] fc_issue_count;
+    logic       fc_issue_term;
+    logic signed [15:0] fc_term0_sum;
     logic signed [11:0] best_score;
     logic [3:0] best_idx;
 
     // -------------------------------------------------------------------------
     // Helpers.
     // -------------------------------------------------------------------------
-    function automatic logic signed [7:0] get_c1_w(input integer oc, input integer k);
-        begin
-            case (oc)
-                0: get_c1_w = $signed(w_11[(8*k)+:8]);
-                1: get_c1_w = $signed(w_12[(8*k)+:8]);
-                default: get_c1_w = $signed(w_13[(8*k)+:8]);
-            endcase
-        end
-    endfunction
+    // Layer-specific scale restoration from the searched V25-H point.
+    localparam integer C1_RESTORE_SHIFT = 3; // INT8 -> W5
+    localparam integer C2_RESTORE_SHIFT = 5; // A11->A8 (3) + INT8->W6 (2)
+    localparam integer FC_RESTORE_SHIFT = 5; // A11->A8 (3) + INT8->W6 (2)
 
-    function automatic logic signed [7:0] get_c2_w(input integer oc, input integer ic, input integer k);
-        integer sel;
+    // Conv1 physical channel 0/1 corresponds to original channel 1/2.
+    function automatic logic signed [7:0] get_b1(input integer phys_oc);
         begin
-            sel = oc*3 + ic;
-            case (sel)
-                0: get_c2_w = $signed(w_211[(8*k)+:8]);
-                1: get_c2_w = $signed(w_212[(8*k)+:8]);
-                2: get_c2_w = $signed(w_213[(8*k)+:8]);
-                3: get_c2_w = $signed(w_221[(8*k)+:8]);
-                4: get_c2_w = $signed(w_222[(8*k)+:8]);
-                5: get_c2_w = $signed(w_223[(8*k)+:8]);
-                6: get_c2_w = $signed(w_231[(8*k)+:8]);
-                7: get_c2_w = $signed(w_232[(8*k)+:8]);
-                default: get_c2_w = $signed(w_233[(8*k)+:8]);
-            endcase
-        end
-    endfunction
-
-    function automatic logic signed [7:0] get_b1(input integer oc);
-        begin
-            case (oc)
-                0: get_b1 = $signed(b_1[0+:8]);
-                1: get_b1 = $signed(b_1[8+:8]);
-                2: get_b1 = $signed(b_1[16+:8]);
+            case (phys_oc)
+                0: get_b1 = $signed(b_1[8+:8]);
+                1: get_b1 = $signed(b_1[16+:8]);
                 default: get_b1 = 8'sd0;
             endcase
         end
@@ -168,10 +154,6 @@ module chip_pfdw_fc_v18a (
                 default: get_b2 = 8'sd0;
             endcase
         end
-    endfunction
-
-    function automatic logic signed [7:0] get_fcw(input integer cls, input integer n);
-        get_fcw = $signed(w_fc[(8*(cls*48+n))+:8]);
     endfunction
 
     function automatic logic signed [7:0] get_fcb(input integer cls);
@@ -227,6 +209,26 @@ module chip_pfdw_fc_v18a (
         end
     endfunction
 
+    // Exact A8 storage used by the V25 search model:
+    // pool/ReLU is still performed in the 12-bit domain, then arithmetic >>3.
+    function automatic logic [7:0] max4_relu_a8(
+        input logic signed [11:0] a,
+        input logic signed [11:0] b,
+        input logic signed [11:0] c,
+        input logic signed [11:0] d
+    );
+        logic signed [11:0] m0, m1, m;
+        begin
+            m0 = (a >= b) ? a : b;
+            m1 = (c >= d) ? c : d;
+            m  = (m0 >= m1) ? m0 : m1;
+            if (m > 0)
+                max4_relu_a8 = m[10:3];
+            else
+                max4_relu_a8 = 8'd0;
+        end
+    endfunction
+
     function automatic [2:0] add_mod7(
         input logic [2:0] base,
         input integer off
@@ -244,21 +246,18 @@ module chip_pfdw_fc_v18a (
     // -------------------------------------------------------------------------
     logic req_valid, req_is_fc;
     logic [15:0] req_tag;
-    logic signed [11:0] req_tile [0:5][0:5];
-    logic signed [7:0]  req_kernel [0:4][0:4];
-    logic signed [11:0] req_fc_a [0:47];
-    logic signed [7:0]  req_fc_b [0:47];
+    logic signed [8:0] req_tile [0:5][0:5];
+    logic signed [8:0] req_fc_a [0:47];
 
     logic rsp_valid, rsp_is_fc;
     logic [15:0] rsp_tag;
-    logic signed [31:0] rsp_y00, rsp_y01, rsp_y10, rsp_y11;
-    logic signed [39:0] rsp_fc_sum;
+    logic signed [19:0] rsp_y00, rsp_y01, rsp_y10, rsp_y11;
+    logic signed [15:0] rsp_fc_sum;
 
-    pfdw_pipe49_booth_engine_v18a u_engine (
+    pfdw_pipe49_shift_engine_v25h u_engine (
         .clk(clk), .rst_n(rst_n),
         .req_valid(req_valid), .req_is_fc(req_is_fc), .req_tag(req_tag),
-        .conv_tile(req_tile), .conv_kernel(req_kernel),
-        .fc_a(req_fc_a), .fc_b(req_fc_b),
+        .conv_tile(req_tile), .fc_a(req_fc_a),
         .rsp_valid(rsp_valid), .rsp_is_fc(rsp_is_fc), .rsp_tag(rsp_tag),
         .conv_y00(rsp_y00), .conv_y01(rsp_y01),
         .conv_y10(rsp_y10), .conv_y11(rsp_y11),
@@ -276,15 +275,14 @@ module chip_pfdw_fc_v18a (
         // V6 issues Conv1 only from the local sliding window. The row-start
         // window becomes valid on the same capture edge that makes V6's first
         // tile ready; subsequent horizontal tiles are shifted in-place.
-        c1_tile_ready = (c1_issue_count < 9'd432) && c1_window_valid;
+        c1_tile_ready = (c1_issue_count < 9'd288) && c1_window_valid;
 
-        // fmap1 is produced row-major, then col-major, then channel 0/1/2.
-        // Require the last element of the current Conv2 6x6 input window for
-        // the selected input channel to have completed on a prior cycle.
+        // fmap1 is produced row-major, col-major, then two physical channels.
+        // Physical ic0/ic1 map to original Conv1 channels 1/2.
         c2_required_commit_idx = (((c2_issue_pr*2 + 5) * 12
-                                 + (c2_issue_pc*2 + 5)) * 3
+                                 + (c2_issue_pc*2 + 5)) * 2
                                  + c2_issue_ic);
-        c2_data_ready = (c2_issue_count < 8'd144)
+        c2_data_ready = (c2_issue_count < 8'd96)
                      && (c1_commit_count > c2_required_commit_idx);
     end
 
@@ -307,15 +305,10 @@ module chip_pfdw_fc_v18a (
 
         for (rr = 0; rr < 6; rr = rr + 1)
             for (cc = 0; cc < 6; cc = cc + 1)
-                req_tile[rr][cc] = 12'sd0;
-
-        for (rr = 0; rr < 5; rr = rr + 1)
-            for (cc = 0; cc < 5; cc = cc + 1)
-                req_kernel[rr][cc] = 8'sd0;
+                req_tile[rr][cc] = 9'sd0;
 
         for (lane = 0; lane < 48; lane = lane + 1) begin
-            req_fc_a[lane] = 12'sd0;
-            req_fc_b[lane] = 8'sd0;
+            req_fc_a[lane] = 9'sd0;
         end
 
         if (state == ST_STREAM) begin
@@ -323,46 +316,33 @@ module chip_pfdw_fc_v18a (
                 issue_c1 = 1'b1;
                 req_valid = 1'b1;
                 req_is_fc = 1'b0;
-                req_tag = {1'b0, 3'b000, c1_issue_pr, c1_issue_pc, c1_issue_oc, 2'b00};
+                req_tag = {1'b0, 3'b000, c1_issue_pr, c1_issue_pc, 1'b0, c1_issue_oc, 2'b00};
 
                 // Fixed/local wiring: no c1_issue_pc-driven 28-column mux.
                 for (rr = 0; rr < 6; rr = rr + 1)
                     for (cc = 0; cc < 6; cc = cc + 1)
-                        req_tile[rr][cc] = c1_window[rr][cc];
-
-                for (rr = 0; rr < 5; rr = rr + 1)
-                    for (cc = 0; cc < 5; cc = cc + 1) begin
-                        kk = rr*5 + cc;
-                        req_kernel[rr][cc] = get_c1_w(c1_issue_oc,kk);
-                    end
+                        req_tile[rr][cc] = {1'b0,c1_window[rr][cc]};
             end else if (c2_data_ready) begin
                 issue_c2 = 1'b1;
                 req_valid = 1'b1;
                 req_is_fc = 1'b0;
                 req_tag = {1'b1, 3'b000, {2'b00,c2_issue_pr},
-                           {2'b00,c2_issue_pc}, c2_issue_oc, c2_issue_ic};
+                           {2'b00,c2_issue_pc}, c2_issue_oc, 1'b0, c2_issue_ic};
 
                 for (rr = 0; rr < 6; rr = rr + 1)
                     for (cc = 0; cc < 6; cc = cc + 1)
-                        req_tile[rr][cc] = fmap1_ring[c2_issue_ic]
-                            [add_mod7(c2_base_slot,rr)][c2_issue_pc*2+cc];
-
-                for (rr = 0; rr < 5; rr = rr + 1)
-                    for (cc = 0; cc < 5; cc = cc + 1) begin
-                        kk = rr*5 + cc;
-                        req_kernel[rr][cc] = get_c2_w(c2_issue_oc,c2_issue_ic,kk);
-                    end
+                        req_tile[rr][cc] = {1'b0, fmap1_ring[c2_issue_ic]
+                            [add_mod7(c2_base_slot,rr)][c2_issue_pc*2+cc]};
             end
-        end else if (state == ST_FC && fc_issue_count < 4'd10) begin
+        end else if (state == ST_FC && fc_issue_count < 5'd20) begin
             req_valid = 1'b1;
             req_is_fc = 1'b1;
-            req_tag = {12'd0,fc_issue_class};
+            req_tag = {11'd0,fc_issue_term,fc_issue_class};
 
             for (lane = 0; lane < 48; lane = lane + 1) begin
                 ch  = lane / 16;
                 pos = lane % 16;
-                req_fc_a[lane] = fmap2[ch][pos/4][pos%4];
-                req_fc_b[lane] = get_fcw(fc_issue_class,lane);
+                req_fc_a[lane] = {1'b0,fmap2[ch][pos/4][pos%4]};
             end
         end
     end
@@ -376,23 +356,28 @@ module chip_pfdw_fc_v18a (
     wire [1:0] rsp_oc = rsp_tag[3:2];
     wire [1:0] rsp_ic = rsp_tag[1:0];
     wire [3:0] rsp_fc_class = rsp_tag[3:0];
+    wire       rsp_fc_term  = rsp_tag[4];
 
     logic signed [11:0] rsp_c1q00, rsp_c1q01, rsp_c1q10, rsp_c1q11;
     logic signed [19:0] rsp_eng20_00, rsp_eng20_01, rsp_eng20_10, rsp_eng20_11;
     logic signed [11:0] c2_wb0_q00, c2_wb0_q01, c2_wb0_q10, c2_wb0_q11;
-    logic signed [19:0] fc_sum20, fc_final20, fc_bias20;
     logic signed [11:0] fc_score_now;
+    logic signed [16:0] fc_class_sum;
+    logic [13:0] fc_sum_mod14;
+    logic [11:0] fc_base12;
+    logic [1:0]  fc_rem2;
+    logic signed [8:0] fc_low9;
 
     always_comb begin
-        rsp_c1q00 = conv1_q(rsp_y00,get_b1(rsp_oc));
-        rsp_c1q01 = conv1_q(rsp_y01,get_b1(rsp_oc));
-        rsp_c1q10 = conv1_q(rsp_y10,get_b1(rsp_oc));
-        rsp_c1q11 = conv1_q(rsp_y11,get_b1(rsp_oc));
+        rsp_c1q00 = conv1_q($signed(rsp_y00) <<< C1_RESTORE_SHIFT,get_b1(rsp_oc));
+        rsp_c1q01 = conv1_q($signed(rsp_y01) <<< C1_RESTORE_SHIFT,get_b1(rsp_oc));
+        rsp_c1q10 = conv1_q($signed(rsp_y10) <<< C1_RESTORE_SHIFT,get_b1(rsp_oc));
+        rsp_c1q11 = conv1_q($signed(rsp_y11) <<< C1_RESTORE_SHIFT,get_b1(rsp_oc));
 
-        rsp_eng20_00 = rsp_y00[19:0];
-        rsp_eng20_01 = rsp_y01[19:0];
-        rsp_eng20_10 = rsp_y10[19:0];
-        rsp_eng20_11 = rsp_y11[19:0];
+        rsp_eng20_00 = $signed(rsp_y00[19:0]) <<< C2_RESTORE_SHIFT;
+        rsp_eng20_01 = $signed(rsp_y01[19:0]) <<< C2_RESTORE_SHIFT;
+        rsp_eng20_10 = $signed(rsp_y10[19:0]) <<< C2_RESTORE_SHIFT;
+        rsp_eng20_11 = $signed(rsp_y11[19:0]) <<< C2_RESTORE_SHIFT;
 
         // WB1 quantization is now isolated from engine-output accumulation.
         c2_wb0_q00 = conv2_q(c2_wb0_sum00,get_b2(c2_wb0_oc));
@@ -400,12 +385,24 @@ module chip_pfdw_fc_v18a (
         c2_wb0_q10 = conv2_q(c2_wb0_sum10,get_b2(c2_wb0_oc));
         c2_wb0_q11 = conv2_q(c2_wb0_sum11,get_b2(c2_wb0_oc));
 
-        // Low-20-bit sum of all 48 products is identical to the V2/V3/V4
-        // modulo-2^20 behavior.
-        fc_sum20   = rsp_fc_sum[19:0];
-        fc_bias20  = get_fcb(rsp_fc_class);
-        fc_final20 = fc_sum20 + fc_bias20;
-        fc_score_now = fc_final20[18:7];
+        // Exact reduced FC score datapath for restore shift=5.
+        // Original semantics:
+        //   score = signed_slice(wrap20((sum<<5)+bias),18,7)
+        // Only sum[13:0], the two low remainder bits and a {-1,0,+1}
+        // correction are required. This removes V24's 20-bit bias adder and
+        // breaks the old b_fc -> best_score critical path without 80 bias FFs.
+        fc_class_sum = $signed({fc_term0_sum[15],fc_term0_sum})
+                     + $signed({rsp_fc_sum[15],rsp_fc_sum});
+        fc_sum_mod14 = fc_class_sum[13:0];
+        fc_base12 = fc_sum_mod14[13:2];
+        fc_rem2 = fc_sum_mod14[1:0];
+        fc_low9 = $signed({2'b00,fc_rem2,5'b00000}) + $signed(get_fcb(rsp_fc_class));
+        if (fc_low9 < 0)
+            fc_score_now = $signed(fc_base12) - 12'sd1;
+        else if (fc_low9 >= 9'sd128)
+            fc_score_now = $signed(fc_base12) + 12'sd1;
+        else
+            fc_score_now = $signed(fc_base12);
     end
 
     // -------------------------------------------------------------------------
@@ -449,6 +446,8 @@ module chip_pfdw_fc_v18a (
 
             fc_issue_class <= 0;
             fc_issue_count <= 0;
+            fc_issue_term <= 1'b0;
+            fc_term0_sum <= 16'sd0;
             best_score <= -12'sd2048;
             best_idx <= 0;
 
@@ -463,7 +462,7 @@ module chip_pfdw_fc_v18a (
             c1_wb_valid <= 1'b0;
             if (c1_wb_valid) begin
                 fmap1_ring[c1_wb_oc][c1_wb_slot][c1_wb_pc] <=
-                    max4_relu(c1_wb_q00,c1_wb_q01,c1_wb_q10,c1_wb_q11);
+                    max4_relu_a8(c1_wb_q00,c1_wb_q01,c1_wb_q10,c1_wb_q11);
                 c1_commit_count <= c1_commit_count + 1'b1;
             end
 
@@ -483,7 +482,7 @@ module chip_pfdw_fc_v18a (
             // Commit pooled Conv2 output from the isolated WB1 stage.
             if (c2_wb1_valid) begin
                 fmap2[c2_wb1_oc][c2_wb1_pr][c2_wb1_pc] <=
-                    max4_relu(c2_wb1_q00,c2_wb1_q01,c2_wb1_q10,c2_wb1_q11);
+                    max4_relu_a8(c2_wb1_q00,c2_wb1_q01,c2_wb1_q10,c2_wb1_q11);
                 c2_commit_count <= c2_commit_count + 1'b1;
 
                 // Start FC only after the 48th pooled fmap2 value is committed.
@@ -491,6 +490,8 @@ module chip_pfdw_fc_v18a (
                     state <= ST_FC;
                     fc_issue_class <= 0;
                     fc_issue_count <= 0;
+                    fc_issue_term <= 1'b0;
+                    fc_term0_sum <= 16'sd0;
                     best_score <= -12'sd2048;
                     best_idx <= 0;
                 end
@@ -517,10 +518,10 @@ module chip_pfdw_fc_v18a (
                         for (c1wr = 0; c1wr < 6; c1wr = c1wr + 1) begin
                             for (c1wc = 0; c1wc < 6; c1wc = c1wc + 1) begin
                                 if ((c1wr == 5) && (c1wc == 5))
-                                    c1_window[c1wr][c1wc] <= {4'd0,data_in};
+                                    c1_window[c1wr][c1wc] <= data_in;
                                 else
                                     c1_window[c1wr][c1wc] <=
-                                        {4'd0,linebuf[add_mod7(c1_base_slot,c1wr)][c1wc]};
+                                        linebuf[add_mod7(c1_base_slot,c1wr)][c1wc];
                             end
                         end
                         c1_window_valid <= 1'b1;
@@ -539,13 +540,13 @@ module chip_pfdw_fc_v18a (
             end
 
             // Request-side progress. Conv1 reuses the same local 6x6 window
-            // for output channels 0/1/2. On channel 2 the window advances by
-            // stride 2: four columns are retained and only two entering
+            // for the two surviving output channels. After physical channel 1, the
+            // window advances by stride 2: four columns are retained and only two entering
             // columns (12 bytes total) are fetched from linebuf.
             if (req_valid && !req_is_fc && issue_c1) begin
                 c1_issue_count <= c1_issue_count + 1'b1;
-                if (c1_issue_oc < 2) begin
-                    c1_issue_oc <= c1_issue_oc + 1'b1;
+                if (c1_issue_oc == 1'b0) begin
+                    c1_issue_oc <= 1'b1;
                 end else begin
                     c1_issue_oc <= 0;
                     if (c1_issue_pc < 11) begin
@@ -555,9 +556,18 @@ module chip_pfdw_fc_v18a (
                             c1_window[c1wr][2] <= c1_window[c1wr][4];
                             c1_window[c1wr][3] <= c1_window[c1wr][5];
                             c1_window[c1wr][4] <=
-                                {4'd0,linebuf[add_mod7(c1_base_slot,c1wr)][c1_new_col]};
-                            c1_window[c1wr][5] <=
-                                {4'd0,linebuf[add_mod7(c1_base_slot,c1wr)][c1_new_col + 1'b1]};
+                                linebuf[add_mod7(c1_base_slot,c1wr)][c1_new_col];
+                            // With only two Conv1 channels, the horizontal
+                            // window advances one cycle earlier than V24.
+                            // The newest bottom-row byte is being captured on
+                            // this same edge, so bypass the linebuf NBA write.
+                            if ((c1wr == 5) &&
+                                (cap_row == ({c1_issue_pr,1'b0} + 5'd5)) &&
+                                (cap_col == (c1_new_col + 1'b1)))
+                                c1_window[c1wr][5] <= data_in;
+                            else
+                                c1_window[c1wr][5] <=
+                                    linebuf[add_mod7(c1_base_slot,c1wr)][c1_new_col + 1'b1];
                         end
                         c1_new_col <= c1_new_col + 5'd2;
                         c1_issue_pc <= c1_issue_pc + 1'b1;
@@ -578,10 +588,10 @@ module chip_pfdw_fc_v18a (
 
             if (req_valid && !req_is_fc && issue_c2) begin
                 c2_issue_count <= c2_issue_count + 1'b1;
-                if (c2_issue_ic < 2) begin
-                    c2_issue_ic <= c2_issue_ic + 1'b1;
+                if (c2_issue_ic == 1'b0) begin
+                    c2_issue_ic <= 1'b1;
                 end else begin
-                    c2_issue_ic <= 0;
+                    c2_issue_ic <= 1'b0;
                     if (c2_issue_oc < 2) begin
                         c2_issue_oc <= c2_issue_oc + 1'b1;
                     end else begin
@@ -601,8 +611,13 @@ module chip_pfdw_fc_v18a (
 
             if (req_valid && req_is_fc && state == ST_FC) begin
                 fc_issue_count <= fc_issue_count + 1'b1;
-                if (fc_issue_class < 9)
-                    fc_issue_class <= fc_issue_class + 1'b1;
+                if (fc_issue_term == 1'b0) begin
+                    fc_issue_term <= 1'b1;
+                end else begin
+                    fc_issue_term <= 1'b0;
+                    if (fc_issue_class < 9)
+                        fc_issue_class <= fc_issue_class + 1'b1;
+                end
             end
 
             // Conv1 response -> WB0 quantization register. Pool/ReLU and the
@@ -618,8 +633,8 @@ module chip_pfdw_fc_v18a (
                 c1_wb_q11 <= rsp_c1q11;
             end
 
-            // Conv2 response -> 3-channel accumulation.
-            // The third-channel result is captured into WB0 instead of running
+            // Conv2 response -> two-input-channel accumulation.
+            // The second input-channel result is captured into WB0 instead of running
             // accumulation + quantization + pool/ReLU in one cycle.
             if (rsp_valid && !rsp_is_fc && (rsp_layer == 1'b1)) begin
                 c2_rsp_count <= c2_rsp_count + 1'b1;
@@ -629,11 +644,6 @@ module chip_pfdw_fc_v18a (
                     c2_acc01 <= rsp_eng20_01;
                     c2_acc10 <= rsp_eng20_10;
                     c2_acc11 <= rsp_eng20_11;
-                end else if (rsp_ic == 1) begin
-                    c2_acc00 <= c2_acc00 + rsp_eng20_00;
-                    c2_acc01 <= c2_acc01 + rsp_eng20_01;
-                    c2_acc10 <= c2_acc10 + rsp_eng20_10;
-                    c2_acc11 <= c2_acc11 + rsp_eng20_11;
                 end else begin
                     c2_wb0_valid <= 1'b1;
                     c2_wb0_pr <= rsp_pr[1:0];
@@ -649,23 +659,29 @@ module chip_pfdw_fc_v18a (
                 end
             end
 
-            // 48-lane FC response and online argmax.
+            // FC SP2 is evaluated as two temporal PoT1 passes per class.
+            // term0 is buffered; term1 completes the exact SP2 dot product,
+            // after which the reduced-width bias/argmax datapath runs.
             if (rsp_valid && rsp_is_fc) begin
-                if (rsp_fc_class == 0) begin
-                    best_score <= fc_score_now;
-                    best_idx <= 0;
-                end else if ($signed(fc_score_now) > $signed(best_score)) begin
-                    best_score <= fc_score_now;
-                    best_idx <= rsp_fc_class;
-                end
+                if (rsp_fc_term == 1'b0) begin
+                    fc_term0_sum <= rsp_fc_sum;
+                end else begin
+                    if (rsp_fc_class == 0) begin
+                        best_score <= fc_score_now;
+                        best_idx <= 0;
+                    end else if ($signed(fc_score_now) > $signed(best_score)) begin
+                        best_score <= fc_score_now;
+                        best_idx <= rsp_fc_class;
+                    end
 
-                if (rsp_fc_class == 9) begin
-                    if ($signed(fc_score_now) > $signed(best_score))
-                        decision <= 4'd9;
-                    else
-                        decision <= best_idx;
-                    valid_out_6 <= 1'b1;
-                    state <= ST_DONE;
+                    if (rsp_fc_class == 9) begin
+                        if ($signed(fc_score_now) > $signed(best_score))
+                            decision <= 4'd9;
+                        else
+                            decision <= best_idx;
+                        valid_out_6 <= 1'b1;
+                        state <= ST_DONE;
+                    end
                 end
             end
         end

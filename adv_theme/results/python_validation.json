@@ -1,0 +1,24 @@
+{
+  "status": "PASS",
+  "random_tile_cases": 1000,
+  "network_cases": 12,
+  "rounding_cases": 98316,
+  "label_identity_and_boundaries": true,
+  "export_roundtrip": true,
+  "counts": {
+    "conv_tile_requests": 2016,
+    "fc48_requests": 12,
+    "fc40_requests": 15,
+    "direct_dense_products": 202176,
+    "direct_sparse_products": 169920,
+    "nominal_dwm49_products": 99360,
+    "dwm40_products": 81216,
+    "active_weights": 2214,
+    "biases_single_profile": 21,
+    "lora_parameters_per_codec": 288,
+    "packed_single_profile_bytes": 1920,
+    "packed_three_profile_bytes": 4608
+  },
+  "real_video_accuracy": "NOT_MEASURED",
+  "ppa": "NOT_MEASURED"
+}
