@@ -1,2 +1,2 @@
-numpy>=1.24,<3
-torch==2.5.1
+-r requirements.txt
+torch>=2.5,<3

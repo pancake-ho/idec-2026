@@ -1,0 +1,32 @@
+{
+  "status": "PASS",
+  "scope": "actual MPD SIDX parsing; not real-video quality accuracy",
+  "results": [
+    {
+      "movie": "BigBuckBunny",
+      "representation": 0,
+      "segment_count": 299,
+      "last_duration": 0.4583333333333333,
+      "first_sizes": [
+        12895,
+        8337,
+        11518,
+        10983
+      ],
+      "source_url": "https://ftp.itec.aau.at/datasets/DASHDataset2014/BigBuckBunny/2sec/bunny_45652bps/BigBuckBunny_2snonSeg.mp4"
+    },
+    {
+      "movie": "ElephantsDream",
+      "representation": 0,
+      "segment_count": 327,
+      "last_duration": 1.7916666666666667,
+      "first_sizes": [
+        9299,
+        10643,
+        11954,
+        12256
+      ],
+      "source_url": "https://ftp.itec.aau.at/datasets/DASHDataset2014/ElephantsDream/2sec/ed_46319bps/ElephantsDream_2snonSeg.mp4"
+    }
+  ]
+}

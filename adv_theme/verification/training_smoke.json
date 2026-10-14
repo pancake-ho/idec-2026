@@ -1,0 +1,674 @@
+{
+  "status": "SYNTHETIC_SMOKE_ONLY",
+  "training_config": {
+    "seed": 2026,
+    "variant": "final",
+    "base_epochs": 2,
+    "qat_epochs": 2,
+    "batch_size": 64,
+    "base_lr": 0.001,
+    "qat_lr": 0.0002,
+    "calibration_samples": 1024
+  },
+  "split_audit": {
+    "policy": "blocked_temporal_with_guard",
+    "segment_groups_disjoint": true,
+    "temporal_gap_checked": true,
+    "content_disjoint": false,
+    "source_counts": [
+      1,
+      1
+    ],
+    "class_counts": [
+      [
+        6,
+        6,
+        6,
+        6
+      ],
+      [
+        6,
+        6,
+        6,
+        6
+      ]
+    ],
+    "note": "Prototype within-content split; not an unseen-content generalization claim"
+  },
+  "history": [
+    {
+      "stage": "fp32",
+      "epoch": 1,
+      "loss": 1.3858404159545898,
+      "validation_accuracy": 0.25,
+      "validation_macro_f1": 0.1,
+      "validation_metrics": {
+        "n": 24,
+        "accuracy": 0.25,
+        "macro_f1": 0.1,
+        "class_names": [
+          "excellent",
+          "great",
+          "good",
+          "poor"
+        ],
+        "class_support": [
+          6,
+          6,
+          6,
+          6
+        ],
+        "class_f1": [
+          0.0,
+          0.4,
+          0.0,
+          0.0
+        ],
+        "class_recall": [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        "confusion": [
+          [
+            0,
+            6,
+            0,
+            0
+          ],
+          [
+            0,
+            6,
+            0,
+            0
+          ],
+          [
+            0,
+            6,
+            0,
+            0
+          ],
+          [
+            0,
+            6,
+            0,
+            0
+          ]
+        ],
+        "severe_missed_as_excellent": 0.0,
+        "mean_absolute_grade_error": 1.0,
+        "all_classes_present": true,
+        "videos": {
+          "synthetic": {
+            "n": 24,
+            "accuracy": 0.25,
+            "macro_f1": 0.1,
+            "class_names": [
+              "excellent",
+              "great",
+              "good",
+              "poor"
+            ],
+            "class_support": [
+              6,
+              6,
+              6,
+              6
+            ],
+            "class_f1": [
+              0.0,
+              0.4,
+              0.0,
+              0.0
+            ],
+            "class_recall": [
+              0.0,
+              1.0,
+              0.0,
+              0.0
+            ],
+            "confusion": [
+              [
+                0,
+                6,
+                0,
+                0
+              ],
+              [
+                0,
+                6,
+                0,
+                0
+              ],
+              [
+                0,
+                6,
+                0,
+                0
+              ],
+              [
+                0,
+                6,
+                0,
+                0
+              ]
+            ],
+            "severe_missed_as_excellent": 0.0,
+            "mean_absolute_grade_error": 1.0,
+            "all_classes_present": true
+          }
+        }
+      },
+      "selection_arithmetic": "float32"
+    },
+    {
+      "stage": "fp32",
+      "epoch": 2,
+      "loss": 1.3759382963180542,
+      "validation_accuracy": 0.25,
+      "validation_macro_f1": 0.1,
+      "validation_metrics": {
+        "n": 24,
+        "accuracy": 0.25,
+        "macro_f1": 0.1,
+        "class_names": [
+          "excellent",
+          "great",
+          "good",
+          "poor"
+        ],
+        "class_support": [
+          6,
+          6,
+          6,
+          6
+        ],
+        "class_f1": [
+          0.0,
+          0.4,
+          0.0,
+          0.0
+        ],
+        "class_recall": [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        "confusion": [
+          [
+            0,
+            6,
+            0,
+            0
+          ],
+          [
+            0,
+            6,
+            0,
+            0
+          ],
+          [
+            0,
+            6,
+            0,
+            0
+          ],
+          [
+            0,
+            6,
+            0,
+            0
+          ]
+        ],
+        "severe_missed_as_excellent": 0.0,
+        "mean_absolute_grade_error": 1.0,
+        "all_classes_present": true,
+        "videos": {
+          "synthetic": {
+            "n": 24,
+            "accuracy": 0.25,
+            "macro_f1": 0.1,
+            "class_names": [
+              "excellent",
+              "great",
+              "good",
+              "poor"
+            ],
+            "class_support": [
+              6,
+              6,
+              6,
+              6
+            ],
+            "class_f1": [
+              0.0,
+              0.4,
+              0.0,
+              0.0
+            ],
+            "class_recall": [
+              0.0,
+              1.0,
+              0.0,
+              0.0
+            ],
+            "confusion": [
+              [
+                0,
+                6,
+                0,
+                0
+              ],
+              [
+                0,
+                6,
+                0,
+                0
+              ],
+              [
+                0,
+                6,
+                0,
+                0
+              ],
+              [
+                0,
+                6,
+                0,
+                0
+              ]
+            ],
+            "severe_missed_as_excellent": 0.0,
+            "mean_absolute_grade_error": 1.0,
+            "all_classes_present": true
+          }
+        }
+      },
+      "selection_arithmetic": "float32"
+    },
+    {
+      "stage": "qat",
+      "epoch": 1,
+      "loss": 1.3917979001998901,
+      "validation_accuracy": 0.25,
+      "validation_macro_f1": 0.1,
+      "validation_metrics": {
+        "n": 24,
+        "accuracy": 0.25,
+        "macro_f1": 0.1,
+        "class_names": [
+          "excellent",
+          "great",
+          "good",
+          "poor"
+        ],
+        "class_support": [
+          6,
+          6,
+          6,
+          6
+        ],
+        "class_f1": [
+          0.0,
+          0.4,
+          0.0,
+          0.0
+        ],
+        "class_recall": [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        "confusion": [
+          [
+            0,
+            6,
+            0,
+            0
+          ],
+          [
+            0,
+            6,
+            0,
+            0
+          ],
+          [
+            0,
+            6,
+            0,
+            0
+          ],
+          [
+            0,
+            6,
+            0,
+            0
+          ]
+        ],
+        "severe_missed_as_excellent": 0.0,
+        "mean_absolute_grade_error": 1.0,
+        "all_classes_present": true,
+        "videos": {
+          "synthetic": {
+            "n": 24,
+            "accuracy": 0.25,
+            "macro_f1": 0.1,
+            "class_names": [
+              "excellent",
+              "great",
+              "good",
+              "poor"
+            ],
+            "class_support": [
+              6,
+              6,
+              6,
+              6
+            ],
+            "class_f1": [
+              0.0,
+              0.4,
+              0.0,
+              0.0
+            ],
+            "class_recall": [
+              0.0,
+              1.0,
+              0.0,
+              0.0
+            ],
+            "confusion": [
+              [
+                0,
+                6,
+                0,
+                0
+              ],
+              [
+                0,
+                6,
+                0,
+                0
+              ],
+              [
+                0,
+                6,
+                0,
+                0
+              ],
+              [
+                0,
+                6,
+                0,
+                0
+              ]
+            ],
+            "severe_missed_as_excellent": 0.0,
+            "mean_absolute_grade_error": 1.0,
+            "all_classes_present": true
+          }
+        }
+      },
+      "selection_arithmetic": "integer"
+    },
+    {
+      "stage": "qat",
+      "epoch": 2,
+      "loss": 1.3938899040222168,
+      "validation_accuracy": 0.25,
+      "validation_macro_f1": 0.1,
+      "validation_metrics": {
+        "n": 24,
+        "accuracy": 0.25,
+        "macro_f1": 0.1,
+        "class_names": [
+          "excellent",
+          "great",
+          "good",
+          "poor"
+        ],
+        "class_support": [
+          6,
+          6,
+          6,
+          6
+        ],
+        "class_f1": [
+          0.0,
+          0.4,
+          0.0,
+          0.0
+        ],
+        "class_recall": [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        "confusion": [
+          [
+            0,
+            6,
+            0,
+            0
+          ],
+          [
+            0,
+            6,
+            0,
+            0
+          ],
+          [
+            0,
+            6,
+            0,
+            0
+          ],
+          [
+            0,
+            6,
+            0,
+            0
+          ]
+        ],
+        "severe_missed_as_excellent": 0.0,
+        "mean_absolute_grade_error": 1.0,
+        "all_classes_present": true,
+        "videos": {
+          "synthetic": {
+            "n": 24,
+            "accuracy": 0.25,
+            "macro_f1": 0.1,
+            "class_names": [
+              "excellent",
+              "great",
+              "good",
+              "poor"
+            ],
+            "class_support": [
+              6,
+              6,
+              6,
+              6
+            ],
+            "class_f1": [
+              0.0,
+              0.4,
+              0.0,
+              0.0
+            ],
+            "class_recall": [
+              0.0,
+              1.0,
+              0.0,
+              0.0
+            ],
+            "confusion": [
+              [
+                0,
+                6,
+                0,
+                0
+              ],
+              [
+                0,
+                6,
+                0,
+                0
+              ],
+              [
+                0,
+                6,
+                0,
+                0
+              ],
+              [
+                0,
+                6,
+                0,
+                0
+              ]
+            ],
+            "severe_missed_as_excellent": 0.0,
+            "mean_absolute_grade_error": 1.0,
+            "all_classes_present": true
+          }
+        }
+      },
+      "selection_arithmetic": "integer"
+    }
+  ],
+  "integer_crosschecks": 6,
+  "final_validation": {
+    "n": 24,
+    "accuracy": 0.25,
+    "macro_f1": 0.1,
+    "class_names": [
+      "excellent",
+      "great",
+      "good",
+      "poor"
+    ],
+    "class_support": [
+      6,
+      6,
+      6,
+      6
+    ],
+    "class_f1": [
+      0.0,
+      0.4,
+      0.0,
+      0.0
+    ],
+    "class_recall": [
+      0.0,
+      1.0,
+      0.0,
+      0.0
+    ],
+    "confusion": [
+      [
+        0,
+        6,
+        0,
+        0
+      ],
+      [
+        0,
+        6,
+        0,
+        0
+      ],
+      [
+        0,
+        6,
+        0,
+        0
+      ],
+      [
+        0,
+        6,
+        0,
+        0
+      ]
+    ],
+    "severe_missed_as_excellent": 0.0,
+    "mean_absolute_grade_error": 1.0,
+    "all_classes_present": true,
+    "videos": {
+      "synthetic": {
+        "n": 24,
+        "accuracy": 0.25,
+        "macro_f1": 0.1,
+        "class_names": [
+          "excellent",
+          "great",
+          "good",
+          "poor"
+        ],
+        "class_support": [
+          6,
+          6,
+          6,
+          6
+        ],
+        "class_f1": [
+          0.0,
+          0.4,
+          0.0,
+          0.0
+        ],
+        "class_recall": [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        "confusion": [
+          [
+            0,
+            6,
+            0,
+            0
+          ],
+          [
+            0,
+            6,
+            0,
+            0
+          ],
+          [
+            0,
+            6,
+            0,
+            0
+          ],
+          [
+            0,
+            6,
+            0,
+            0
+          ]
+        ],
+        "severe_missed_as_excellent": 0.0,
+        "mean_absolute_grade_error": 1.0,
+        "all_classes_present": true
+      }
+    }
+  },
+  "quant": {
+    "ew1": -9,
+    "ew2": -10,
+    "ewfc": -8,
+    "ea1": -8,
+    "ea2": -12
+  },
+  "torch_version": "2.5.1+cpu",
+  "test": "NOT_READ",
+  "ppa": "NOT_MEASURED",
+  "codec_adaptation": "NOT_USED_AVC_SHARED"
+}

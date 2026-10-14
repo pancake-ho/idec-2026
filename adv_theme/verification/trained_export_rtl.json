@@ -1,0 +1,17 @@
+{
+  "top": "PASS top case=0 class=1 cycles_start_to_output_plus_hold=17099\nPASS top case=1 class=1 cycles_start_to_output_plus_hold=17099\nPASS top case=2 class=1 cycles_start_to_output_plus_hold=17099\nPASS top case=3 class=1 cycles_start_to_output_plus_hold=17099\nPASS top case=0 class=1 cycles_start_to_output_plus_hold=17099\nPASS AVC4 top: five runs, four logits, profile fallback, input/output stalls, mid-patch reset\n/workspace/scratch/c5ed2c37ff9c/output/DASH_AVC4_modular/adv_theme/tests/tb_top.sv:44: $finish called at 855230000 (1ps)\n",
+  "status": "PASS",
+  "classes": 4,
+  "top_runs": 5,
+  "engine_cases": 0,
+  "scope": "functional simulation only; no real-video accuracy/PPA claim",
+  "weights_sha256": "93d900ec20c385d159afa06e96b644ca0a499059b1c923ab0d2e1efdc2d90654",
+  "data_sha256": "f94909a76d3210018d970201d5725cb18417b41d5bab3a6caba5d98747f4681f",
+  "sample_indices": [
+    0,
+    7,
+    15,
+    23
+  ],
+  "weight_provenance": "SYNTHETIC_SMOKE_ONLY"
+}

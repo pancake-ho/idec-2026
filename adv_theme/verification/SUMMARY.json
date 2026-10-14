@@ -1,0 +1,30 @@
+{
+  "status": "FUNCTIONAL_CHECKS_PASS",
+  "python": "3.12",
+  "torch": "2.5.1+cpu",
+  "iverilog": "12.0",
+  "tests": {
+    "data_unit_tests": 9,
+    "random_tiles": 1000,
+    "integer_networks": 8,
+    "rounding_values": 262364,
+    "rtl_engine_vectors": 256,
+    "random_weight_top_runs": 5,
+    "trained_weight_top_runs": 5,
+    "synthetic_avc_videos": 2,
+    "synthetic_avc_encodes": 6,
+    "resumable_http": "PASS",
+    "shared_media_cache": "PASS"
+  },
+  "limits": {
+    "real_bbb_ed_training_accuracy": "NOT_MEASURED",
+    "gpu_training": "NOT_RUN",
+    "ppa": "NOT_MEASURED",
+    "gate_level": "NOT_RUN",
+    "v25h_multiplierless": "NOT_IMPLEMENTED"
+  },
+  "source_reference": {
+    "idec_commit": "0d345f1bb658d5772868c7ef939ac592b7a2bb19",
+    "streaming_commit": "475c6ebdd2c8fe93d476c9c6f556b3024e51976f"
+  }
+}

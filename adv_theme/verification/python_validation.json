@@ -1,0 +1,20 @@
+{
+  "status": "PASS",
+  "random_tiles": 1000,
+  "full_networks": 8,
+  "rounding_values": 262364,
+  "classes": 4,
+  "exact_boundaries": true,
+  "overflow_and_mask_rejection": true,
+  "counts": {
+    "conv_tile_requests": 2016,
+    "fc40_requests": 20,
+    "direct_sparse_products": 170112,
+    "dwm40_products": 81408,
+    "active_weights": 2406,
+    "classes": 4,
+    "codec_banks": 1
+  },
+  "real_video_accuracy": "NOT_MEASURED",
+  "ppa": "NOT_MEASURED"
+}

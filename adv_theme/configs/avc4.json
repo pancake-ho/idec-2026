@@ -1,0 +1,15 @@
+{
+  "name": "bbb_ed_avc_2s_local_ssim4_v1",
+  "videos": [
+    {"id": "bbb", "mpd_url": "https://ftp.itec.aau.at/datasets/DASHDataset2014/BigBuckBunny/2sec/BigBuckBunny_2s_onDemand_2014_05_09.mpd", "reference_url": "https://media.xiph.org/video/derf/y4m/big_buck_bunny_1080p24.y4m.xz"},
+    {"id": "ed", "mpd_url": "https://ftp.itec.aau.at/datasets/DASHDataset2014/ElephantsDream/2sec/ElephantsDream_2s_onDemand_2014_05_09.mpd", "reference_url": "https://media.xiph.org/video/derf/y4m/elephants_dream_1080p24.y4m.xz"}
+  ],
+  "representation_indices": "all",
+  "segment_stride": 3,
+  "frame_offsets_seconds": [0.5, 1.5],
+  "patch_grid": [[0.2, 0.2], [0.2, 0.8], [0.5, 0.5], [0.8, 0.2], [0.8, 0.8]],
+  "split": {"seed": 2026, "block_seconds": 30, "guard_seconds": 2, "validation_fraction": 0.15, "test_fraction": 0.15},
+  "alignment": {"reference_frame_offset": 0, "probe_frame_count": 8, "minimum_median_correlation": 0.98, "maximum_median_mae": 12.0},
+  "training": {"seed": 2026, "variant": "final", "base_epochs": 40, "qat_epochs": 15, "batch_size": 64, "base_lr": 0.001, "qat_lr": 0.0002, "calibration_samples": 1024},
+  "label_contract": "AWS-inspired SSIM4: s>=.95->0; .90<=s<.95->1; .80<s<.90->2; s<=.80->3. Boundaries are fixed in dash_cnn.spec; this string is documentation only."
+}

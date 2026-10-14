@@ -1,0 +1,222 @@
+{
+  "status": "PASS",
+  "split_audit": {
+    "policy": "blocked_temporal_with_guard",
+    "segment_groups_disjoint": true,
+    "temporal_gap_checked": true,
+    "content_disjoint": false,
+    "source_counts": [
+      2,
+      2,
+      2
+    ],
+    "class_counts": [
+      [
+        800,
+        0,
+        0,
+        400
+      ],
+      [
+        160,
+        0,
+        0,
+        80
+      ],
+      [
+        160,
+        0,
+        0,
+        80
+      ]
+    ],
+    "note": "Prototype within-content split; not an unseen-content generalization claim"
+  },
+  "splits": {
+    "train": {
+      "n": 1200,
+      "classes": [
+        800,
+        0,
+        0,
+        400
+      ],
+      "videos": {
+        "mini_bbb": [
+          400,
+          0,
+          0,
+          200
+        ],
+        "mini_ed": [
+          400,
+          0,
+          0,
+          200
+        ]
+      },
+      "all_classes_present": false
+    },
+    "validation": {
+      "n": 240,
+      "classes": [
+        160,
+        0,
+        0,
+        80
+      ],
+      "videos": {
+        "mini_bbb": [
+          80,
+          0,
+          0,
+          40
+        ],
+        "mini_ed": [
+          80,
+          0,
+          0,
+          40
+        ]
+      },
+      "all_classes_present": false
+    },
+    "test": {
+      "n": 240,
+      "classes": [
+        160,
+        0,
+        0,
+        80
+      ],
+      "videos": {
+        "mini_bbb": [
+          80,
+          0,
+          0,
+          40
+        ],
+        "mini_ed": [
+          80,
+          0,
+          0,
+          40
+        ]
+      },
+      "all_classes_present": false
+    }
+  },
+  "media": [
+    {
+      "video_id": "mini_bbb",
+      "representation": 0,
+      "stream": {
+        "width": 64,
+        "height": 64,
+        "fps": 4.0,
+        "duration": 210.0,
+        "frames": 0,
+        "color_range": "unspecified",
+        "pix_fmt": "yuv420p",
+        "sample_aspect_ratio": "1:1"
+      },
+      "segment_count": 105,
+      "last_segment_seconds": 2.0,
+      "media_sha256": "9e5e7395b762b8c87a4eced3042d46d006da1425852f29f419750c9cd4908920"
+    },
+    {
+      "video_id": "mini_bbb",
+      "representation": 1,
+      "stream": {
+        "width": 64,
+        "height": 64,
+        "fps": 4.0,
+        "duration": 210.0,
+        "frames": 0,
+        "color_range": "unspecified",
+        "pix_fmt": "yuv420p",
+        "sample_aspect_ratio": "1:1"
+      },
+      "segment_count": 105,
+      "last_segment_seconds": 2.0,
+      "media_sha256": "0cc0ebc9b7c2f96defdae257f77d8a9a2b826173a23c46eeb43b3fcc929908d4"
+    },
+    {
+      "video_id": "mini_bbb",
+      "representation": 2,
+      "stream": {
+        "width": 64,
+        "height": 64,
+        "fps": 4.0,
+        "duration": 210.0,
+        "frames": 0,
+        "color_range": "unspecified",
+        "pix_fmt": "yuv420p",
+        "sample_aspect_ratio": "1:1"
+      },
+      "segment_count": 105,
+      "last_segment_seconds": 2.0,
+      "media_sha256": "ba34d8f8a420396e1fa9fbce8996089ab489a60b430f7a0b66a45d082444979a"
+    },
+    {
+      "video_id": "mini_ed",
+      "representation": 0,
+      "stream": {
+        "width": 64,
+        "height": 64,
+        "fps": 4.0,
+        "duration": 210.0,
+        "frames": 0,
+        "color_range": "unspecified",
+        "pix_fmt": "yuv420p",
+        "sample_aspect_ratio": "1:1"
+      },
+      "segment_count": 105,
+      "last_segment_seconds": 2.0,
+      "media_sha256": "9e94b61c896c62165e9d3d06fab246ffea03f20536db1bdc0ca297c3cb47bc53"
+    },
+    {
+      "video_id": "mini_ed",
+      "representation": 1,
+      "stream": {
+        "width": 64,
+        "height": 64,
+        "fps": 4.0,
+        "duration": 210.0,
+        "frames": 0,
+        "color_range": "unspecified",
+        "pix_fmt": "yuv420p",
+        "sample_aspect_ratio": "1:1"
+      },
+      "segment_count": 105,
+      "last_segment_seconds": 2.0,
+      "media_sha256": "65ffd487538483c3771251d9bc8c6f2a55fff86aee57291ad3d822b5f1d39e25"
+    },
+    {
+      "video_id": "mini_ed",
+      "representation": 2,
+      "stream": {
+        "width": 64,
+        "height": 64,
+        "fps": 4.0,
+        "duration": 210.0,
+        "frames": 0,
+        "color_range": "unspecified",
+        "pix_fmt": "yuv420p",
+        "sample_aspect_ratio": "1:1"
+      },
+      "segment_count": 105,
+      "last_segment_seconds": 2.0,
+      "media_sha256": "e3a2fef8dd6e444fa4196f6e9f5113ab74c84e9b2415e38cc85e4d79b41c6656"
+    }
+  ],
+  "label": "local Gaussian SSIM, fixed AWS-inspired four bins",
+  "resampling": "Pillow bicubic on source Y only",
+  "input": "decoded Y bytes, never original or SSIM",
+  "real_accuracy": "NOT_MEASURED",
+  "scope": "synthetic AVC video pipeline only",
+  "generated_videos": 2,
+  "generated_avc_encodes": 6,
+  "resumable_http_download": true,
+  "real_content_accuracy": "NOT_MEASURED"
+}

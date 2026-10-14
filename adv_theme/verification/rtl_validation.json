@@ -1,0 +1,9 @@
+{
+  "engine": "PASS engine 256 cases, direct=PFDW, II=1, latency=6, bubbles checked\n/workspace/scratch/c5ed2c37ff9c/output/DASH_AVC4_modular/adv_theme/tests/tb_engine.sv:34: $finish called at 3240000 (1ps)\n",
+  "top": "PASS top case=0 class=3 cycles_start_to_output_plus_hold=17099\nPASS top case=1 class=2 cycles_start_to_output_plus_hold=17099\nPASS top case=2 class=2 cycles_start_to_output_plus_hold=17099\nPASS top case=3 class=2 cycles_start_to_output_plus_hold=17099\nPASS top case=0 class=3 cycles_start_to_output_plus_hold=17099\nPASS AVC4 top: five runs, four logits, profile fallback, input/output stalls, mid-patch reset\n/workspace/scratch/c5ed2c37ff9c/output/DASH_AVC4_modular/adv_theme/tests/tb_top.sv:44: $finish called at 855230000 (1ps)\n",
+  "status": "PASS",
+  "classes": 4,
+  "top_runs": 5,
+  "engine_cases": 256,
+  "scope": "functional simulation only; no real-video accuracy/PPA claim"
+}

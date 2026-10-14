@@ -1,0 +1,41 @@
+{
+  "root": "/data/surt321/repos/idec/adv_theme",
+  "files": [
+    {
+      "path": "src/dash_cnn/data/media.py",
+      "previously_existed": true,
+      "old_sha256": "8ddae4fb51caa0b3fe0e84e1400df05695ff670b0b97acb54103aca1cf73bc11",
+      "new_sha256": "de615810b5e791b95d241629b7da3a4f7b2cc49df7e53455477f4dd0d55a1b6e"
+    },
+    {
+      "path": "src/dash_cnn/data/prepare.py",
+      "previously_existed": true,
+      "old_sha256": "e3bfde5d983e177ac0f9f3c1980233c32d94ca8cb8096d54939762f7778b31f7",
+      "new_sha256": "7612e8da9a2501f5f5a146600dab692a7a082cabf9477ddf77ab68c34a0a7a3a"
+    },
+    {
+      "path": "scripts/run.py",
+      "previously_existed": true,
+      "old_sha256": "4a8c7e5d5b936284443ae19d427d470db9a5d64a0fdc19f41058ca27a5c2d54d",
+      "new_sha256": "a24734dd1003e4c2b308a76e276c65c231394619a0ab5deb122e0869db238149"
+    },
+    {
+      "path": "tests/test_ffmpeg_compat.py",
+      "previously_existed": false,
+      "old_sha256": null,
+      "new_sha256": "468a52e3d8e16044bad49c82b996251b246c9a8fd4b0da5a3dd444a95cd575e6"
+    },
+    {
+      "path": "CODE_FULL.md",
+      "previously_existed": true,
+      "old_sha256": "4cb2fe79cfa8577e950c972ef008e09c2133da736b38712848910a8598670f15",
+      "new_sha256": "b4ce54b9e7e018c00cb2fed8488b82867bffadeb7d75eb3df45fd10094371aca"
+    },
+    {
+      "path": "SOURCE_MANIFEST.json",
+      "previously_existed": true,
+      "old_sha256": "125e19b3a75edc1ace76f73ee69155c05f828adf0904ab9e82b76225d9f473e1",
+      "new_sha256": "4daf646530f07d70b9cf160b754f79e06a7b7a8d7f6c1c812ac82843f4d2604e"
+    }
+  ]
+}
