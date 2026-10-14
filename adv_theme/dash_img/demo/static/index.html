@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>BBB | Interactive DASH Representation Demo</title>
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<div class="shell">
+<header class="topbar">
+  <div class="brandmark">B<span>·</span>B<span>·</span>B</div>
+  <div class="toptext"><div class="kicker">BIG BUCK BUNNY · MPEG-DASH</div><h1>Interactive Video Quality Demo</h1><p>하나의 영상, 서로 다른 압축률. 직접 전환하며 화질 차이를 비교합니다.</p></div>
+  <div class="top-right"><span class="connected"><span class="dot"></span><span id="connection">연결 확인 중</span></span><span class="capsule">REAL AVC MEDIA</span></div>
+</header>
+<div class="announcement"><span class="label-dot"></span><strong>시연 범위</strong> 영상은 서버에 확보한 실제 DASH MP4 표현본입니다. <b>Bandwidth Budget은 자동 선택 정책의 가상 입력</b>이며, 실제 네트워크 대역폭을 제한하거나 전송 성능을 측정하지 않습니다.</div>
+<main class="layout">
+ <section class="stage glass">
+  <div class="section-head"><div><span class="eyebrow">01 / LIVE PLAYER</span><h2>현재 선택한 표현본</h2></div><div class="quality-now"><span class="live-dot"></span><span id="qualityNow">READY</span></div></div>
+  <div class="video-wrap" id="videoWrap"><video id="hero" playsinline muted preload="metadata"></video><div class="video-overlay"><div class="overlay-label" id="overlayLabel">Loading media…</div><div class="overlay-size" id="overlaySize"></div></div><span class="video-hint">화면을 클릭하면 동일 위치를 확대 비교합니다</span></div>
+  <div class="player-controls">
+    <button id="backward" class="button tiny" aria-label="2초 뒤로">−2s</button>
+    <button id="playPause" class="button primary"><span id="playText">▶ 재생</span></button>
+    <button id="forward" class="button tiny" aria-label="2초 앞으로">+2s</button>
+    <div class="seek-area"><input type="range" id="seek" min="0" max="596" step="0.0416667" value="120.5" aria-label="재생 위치"><div class="seek-meta"><span id="currentTime">02:00.50</span><span id="totalTime">09:56.46</span></div></div>
+    <select id="speed" aria-label="재생 속도"><option value="0.5">0.5×</option><option value="1" selected>1.0×</option><option value="1.5">1.5×</option></select>
+  </div>
+  <div class="metrics"><div class="metric"><small>CURRENT BITRATE</small><strong id="metricBitrate">--</strong></div><div class="metric"><small>RESOLUTION</small><strong id="metricResolution">--</strong></div><div class="metric"><small>PLAYBACK POSITION</small><strong id="metricPosition">--</strong></div><div class="metric"><small>SELECTION MODE</small><strong id="metricMode">Manual</strong></div></div>
+  <p id="status" class="status" role="status">실제 BBB 영상의 준비 상태를 확인하고 있습니다.</p>
+ </section>
+ <aside class="control-panel glass">
+   <div class="section-head"><div><span class="eyebrow">02 / CONTROLS</span><h2>화질 직접 조절</h2></div></div>
+   <div class="mode-switch"><button data-mode="manual" class="mode active">Manual</button><button data-mode="auto" class="mode">Auto · Budget</button></div>
+   <div class="control-block"><div class="field-title"><label for="representation">영상 표현본 선택</label><span id="representationNum">--</span></div><select id="representation" class="quality-select"></select><p class="hint">공식 MPD에서 실제 다운로드된 표현본만 선택할 수 있습니다.</p></div>
+   <div class="presets"><button id="presetLow" class="button subtle"><small>LOW</small><strong>131 kbps</strong></button><button id="presetMid" class="button subtle"><small>MID</small><strong>595 kbps</strong></button><button id="presetHigh" class="button subtle"><small>HIGH</small><strong>3.08 Mbps</strong></button></div>
+   <div class="separator"></div>
+   <div class="control-block"><div class="field-title"><label for="budget">가상 네트워크 예산</label><strong id="budgetValue">2.00 Mbps</strong></div><input id="budget" type="range" min="100" max="5500" step="50" value="2000"><div class="scale"><span>100 kbps</span><span>5.50 Mbps</span></div><div class="budget-bar"><div id="budgetBar"></div></div><p class="hint">Auto: 예산의 80% 이하에서 가장 높은 가용 표현본을 선택합니다. 재생 중에는 다음 약 2초 경계에서 전환합니다.</p></div>
+   <div class="decision"><div><small>권장 표현본</small><strong id="recommended">--</strong></div><div><small>전환 대기</small><strong id="pending">없음</strong></div></div>
+   <div class="separator"></div>
+   <label class="check-row"><input id="compareToggle" type="checkbox"><span class="fake-check"></span><span><strong>3개 표현본 동시 비교</strong><small>저·중·고화질을 동일 재생 시점에 맞춰 표시</small></span></label>
+   <p class="footnote">DASH 2-second onDemand의 표현본 변경을 시각화한 교육용 플레이어입니다. 연결 상태, 재생 버퍼, 패킷 손실에 기반한 실제 ABR은 아닙니다.</p>
+ </aside>
+</main>
+<section class="compare-section glass" id="compareSection" hidden>
+ <div class="section-head"><div><span class="eyebrow">03 / SIDE BY SIDE</span><h2>동일 장면 · 세 가지 화질</h2></div><span class="caption" id="compareNote">비교 영상은 최대 약 0.25초의 표시 편차가 생길 수 있습니다.</span></div>
+ <div class="compare-grid">
+  <div class="compare-card"><div class="compare-label"><b>LOW</b><span id="cmp0label">--</span></div><video id="cmp0" playsinline muted preload="metadata"></video></div>
+  <div class="compare-card"><div class="compare-label"><b>MEDIUM</b><span id="cmp1label">--</span></div><video id="cmp1" playsinline muted preload="metadata"></video></div>
+  <div class="compare-card"><div class="compare-label"><b>HIGH</b><span id="cmp2label">--</span></div><video id="cmp2" playsinline muted preload="metadata"></video></div>
+ </div>
+ <div class="zoom-head"><div><span class="eyebrow">DETAIL COMPARISON</span><h3>선택 영역 확대</h3></div><div class="zoom-coords" id="zoomCoords">영상 내 원하는 지점을 클릭하세요</div></div>
+ <div class="compare-grid crops"><div class="crop"><canvas id="crop0" width="480" height="270"></canvas></div><div class="crop"><canvas id="crop1" width="480" height="270"></canvas></div><div class="crop"><canvas id="crop2" width="480" height="270"></canvas></div></div>
+ <p class="footnote">확대 화면은 브라우저 RGB 디코딩 기반 시각 비교이며, 학습용 28×28 Y 패치나 SSIM 측정 결과가 아닙니다.</p>
+</section>
+<footer>Source: DASH Dataset 2014 · BigBuckBunny · AVC 2s onDemand <span>Interactive representation selection / local media</span></footer>
+</div>
+<script src="/app.js" defer></script>
+</body>
+</html>
