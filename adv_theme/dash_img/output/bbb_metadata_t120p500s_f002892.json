@@ -1,0 +1,62 @@
+{
+  "video": "Big Buck Bunny",
+  "source_mpd": "/data/surt321/repos/idec/adv_theme/runs/assets/media/bbb/manifest.mpd",
+  "requested_time_s": 120.5,
+  "aligned_time_s": 120.5,
+  "decoded_frame_index_zero_based": 2892,
+  "selection": "exact",
+  "target_mpd_bandwidths_bps": [
+    131087,
+    595491,
+    3078587
+  ],
+  "actual_representation_files_checked": true,
+  "quality_measure": "Not measured. MPD bandwidth != SSIM label.",
+  "note": "Each image uses the same zero-based decoded frame ordinal, verified H.264/CFR/FPS/start-time.",
+  "zoomin_roi_fraction": [
+    0.4,
+    0.3,
+    0.22,
+    0.22
+  ],
+  "representations": [
+    {
+      "level": "low",
+      "representation_index": 2,
+      "mpd_bandwidth_bps": 131087,
+      "resolution": [
+        320,
+        240
+      ],
+      "fps": "24",
+      "source": "/data/surt321/repos/idec/adv_theme/runs/assets/media/bbb/rep_02.mp4",
+      "frame_png": "/data/surt321/repos/idec/adv_theme/dash_img/output/bbb_low_t120p500s_f002892.png"
+    },
+    {
+      "level": "medium",
+      "representation_index": 9,
+      "mpd_bandwidth_bps": 595491,
+      "resolution": [
+        854,
+        480
+      ],
+      "fps": "24",
+      "source": "/data/surt321/repos/idec/adv_theme/runs/assets/media/bbb/rep_09.mp4",
+      "frame_png": "/data/surt321/repos/idec/adv_theme/dash_img/output/bbb_medium_t120p500s_f002892.png"
+    },
+    {
+      "level": "high",
+      "representation_index": 16,
+      "mpd_bandwidth_bps": 3078587,
+      "resolution": [
+        1920,
+        1080
+      ],
+      "fps": "24",
+      "source": "/data/surt321/repos/idec/adv_theme/runs/assets/media/bbb/rep_16.mp4",
+      "frame_png": "/data/surt321/repos/idec/adv_theme/dash_img/output/bbb_high_t120p500s_f002892.png"
+    }
+  ],
+  "comparison_png": "/data/surt321/repos/idec/adv_theme/dash_img/output/bbb_comparison_t120p500s_f002892.png",
+  "zoom_png": "/data/surt321/repos/idec/adv_theme/dash_img/output/bbb_comparison_zoom_t120p500s_f002892.png"
+}
