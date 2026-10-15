@@ -1,0 +1,3 @@
+# Existing lab Torch 2.4.1 is sufficient; no environment replacement is needed.
+numpy>=1.24
+torch>=2.4

@@ -1,0 +1,19 @@
+{
+  "status": "PASS_EXPORTED_INTEGER_AND_ACTUAL_RTL",
+  "mode": "int8",
+  "backend_equivalence": true,
+  "validation_and_edge_cases": 7,
+  "source": "validation + synthetic U8 patterns",
+  "protocol": "one prime cycle after reset; continuous 784 bytes; no input stalls; per-patch reset",
+  "ppa_status": "NOT_MEASURED",
+  "logs": {
+    "mul": {
+      "engine": "PASS engine: 192 requests, all coefficient tags, bubbles, II=1, latency=6\ntb_engine.sv:35: $finish called at 2230 (1ps)\n",
+      "top": "PASS top case=0 class=1 input_start_to_result_cycles=830\nPASS top case=1 class=3 input_start_to_result_cycles=830\nPASS top case=2 class=2 input_start_to_result_cycles=830\nPASS top case=3 class=3 input_start_to_result_cycles=830\nPASS top case=4 class=0 input_start_to_result_cycles=830\nPASS top case=5 class=3 input_start_to_result_cycles=830\nPASS top case=6 class=3 input_start_to_result_cycles=830\nPASS top: all four scores, both pooled maps, U8 extremes, repeat reset, mid-patch reset\ntb_top.sv:41: $finish called at 67940 (1ps)\n",
+      "rtl_sha256": {
+        "v25_dash_engine.sv": "3e23ceb430752f2a7a410178310c25a57f22518c94982911c3821b6d12540458",
+        "v25_dash_top.sv": "a0aa642f3c35631f38150c09e91943ceadb0360974ee7749896e676e85b79a59"
+      }
+    }
+  }
+}

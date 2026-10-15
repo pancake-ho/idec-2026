@@ -1,0 +1,118 @@
+{
+  "n": 24,
+  "accuracy": 0.375,
+  "macro_f1": 0.2859848484848485,
+  "class_names": [
+    "excellent",
+    "great",
+    "good",
+    "poor"
+  ],
+  "class_support": [
+    6,
+    6,
+    6,
+    6
+  ],
+  "class_f1": [
+    0.0,
+    0.0,
+    0.7272727272727273,
+    0.4166666666666667
+  ],
+  "class_recall": [
+    0.0,
+    0.0,
+    0.6666666666666666,
+    0.8333333333333334
+  ],
+  "confusion": [
+    [
+      0,
+      1,
+      0,
+      5
+    ],
+    [
+      0,
+      0,
+      0,
+      6
+    ],
+    [
+      0,
+      0,
+      4,
+      2
+    ],
+    [
+      0,
+      0,
+      1,
+      5
+    ]
+  ],
+  "severe_missed_as_excellent": 0.0,
+  "mean_absolute_grade_error": 1.2916666666666667,
+  "all_classes_present": true,
+  "videos": {
+    "synthetic": {
+      "n": 24,
+      "accuracy": 0.375,
+      "macro_f1": 0.2859848484848485,
+      "class_names": [
+        "excellent",
+        "great",
+        "good",
+        "poor"
+      ],
+      "class_support": [
+        6,
+        6,
+        6,
+        6
+      ],
+      "class_f1": [
+        0.0,
+        0.0,
+        0.7272727272727273,
+        0.4166666666666667
+      ],
+      "class_recall": [
+        0.0,
+        0.0,
+        0.6666666666666666,
+        0.8333333333333334
+      ],
+      "confusion": [
+        [
+          0,
+          1,
+          0,
+          5
+        ],
+        [
+          0,
+          0,
+          0,
+          6
+        ],
+        [
+          0,
+          0,
+          4,
+          2
+        ],
+        [
+          0,
+          0,
+          1,
+          5
+        ]
+      ],
+      "severe_missed_as_excellent": 0.0,
+      "mean_absolute_grade_error": 1.2916666666666667,
+      "all_classes_present": true
+    }
+  }
+}

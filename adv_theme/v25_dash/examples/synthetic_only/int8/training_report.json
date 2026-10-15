@@ -1,0 +1,256 @@
+{
+  "status": "SYNTHETIC_SMOKE_ONLY",
+  "mode": "int8",
+  "source_commit": "0d345f1bb658d5772868c7ef939ac592b7a2bb19",
+  "parameters": 401,
+  "dataset_identity": {
+    "train": "2bdc4e4e4809cbb50346ea0cfbee523eff20784b4e6a7de537492206f56255ec",
+    "validation": "f94909a76d3210018d970201d5725cb18417b41d5bab3a6caba5d98747f4681f"
+  },
+  "config": {
+    "seed": 2026,
+    "batch_size": 64,
+    "threads": 2,
+    "device": "cpu",
+    "base_epochs": 2,
+    "qat_epochs": 2,
+    "coded_epochs": 2,
+    "lr": 0.001,
+    "qat_lr": 0.0002,
+    "calibration_samples": 24,
+    "sampling": "inverse-frequency WeightedRandomSampler, replacement; unweighted cross entropy"
+  },
+  "split_audit": {
+    "policy": "blocked_temporal_with_guard",
+    "segment_groups_disjoint": true,
+    "temporal_gap_checked": true,
+    "content_disjoint": false,
+    "source_counts": [
+      1,
+      1
+    ],
+    "class_counts": [
+      [
+        6,
+        6,
+        6,
+        6
+      ],
+      [
+        6,
+        6,
+        6,
+        6
+      ]
+    ],
+    "note": "Prototype within-content split; not an unseen-content generalization claim"
+  },
+  "train": {
+    "n": 24,
+    "classes": [
+      6,
+      6,
+      6,
+      6
+    ],
+    "videos": {
+      "synthetic": [
+        6,
+        6,
+        6,
+        6
+      ]
+    },
+    "all_classes_present": true
+  },
+  "validation": {
+    "n": 24,
+    "classes": [
+      6,
+      6,
+      6,
+      6
+    ],
+    "videos": {
+      "synthetic": [
+        6,
+        6,
+        6,
+        6
+      ]
+    },
+    "all_classes_present": true
+  },
+  "best_epoch": 0,
+  "best_validation": {
+    "n": 24,
+    "accuracy": 0.375,
+    "macro_f1": 0.2859848484848485,
+    "class_names": [
+      "excellent",
+      "great",
+      "good",
+      "poor"
+    ],
+    "class_support": [
+      6,
+      6,
+      6,
+      6
+    ],
+    "class_f1": [
+      0.0,
+      0.0,
+      0.7272727272727273,
+      0.4166666666666667
+    ],
+    "class_recall": [
+      0.0,
+      0.0,
+      0.6666666666666666,
+      0.8333333333333334
+    ],
+    "confusion": [
+      [
+        0,
+        1,
+        0,
+        5
+      ],
+      [
+        0,
+        0,
+        0,
+        6
+      ],
+      [
+        0,
+        0,
+        4,
+        2
+      ],
+      [
+        0,
+        0,
+        1,
+        5
+      ]
+    ],
+    "severe_missed_as_excellent": 0.0,
+    "mean_absolute_grade_error": 1.2916666666666667,
+    "all_classes_present": true,
+    "videos": {
+      "synthetic": {
+        "n": 24,
+        "accuracy": 0.375,
+        "macro_f1": 0.2859848484848485,
+        "class_names": [
+          "excellent",
+          "great",
+          "good",
+          "poor"
+        ],
+        "class_support": [
+          6,
+          6,
+          6,
+          6
+        ],
+        "class_f1": [
+          0.0,
+          0.0,
+          0.7272727272727273,
+          0.4166666666666667
+        ],
+        "class_recall": [
+          0.0,
+          0.0,
+          0.6666666666666666,
+          0.8333333333333334
+        ],
+        "confusion": [
+          [
+            0,
+            1,
+            0,
+            5
+          ],
+          [
+            0,
+            0,
+            0,
+            6
+          ],
+          [
+            0,
+            0,
+            4,
+            2
+          ],
+          [
+            0,
+            0,
+            1,
+            5
+          ]
+        ],
+        "severe_missed_as_excellent": 0.0,
+        "mean_absolute_grade_error": 1.2916666666666667,
+        "all_classes_present": true
+      }
+    }
+  },
+  "selection": "maximum validation macro-F1, earliest tie; includes epoch zero",
+  "calibration": "train only; frozen activation/weight exponents throughout QAT",
+  "calibration_sample_ids": [
+    "train/0",
+    "train/1",
+    "train/2",
+    "train/3",
+    "train/4",
+    "train/5",
+    "train/6",
+    "train/7",
+    "train/8",
+    "train/9",
+    "train/10",
+    "train/11",
+    "train/12",
+    "train/13",
+    "train/14",
+    "train/15",
+    "train/16",
+    "train/17",
+    "train/18",
+    "train/19",
+    "train/20",
+    "train/21",
+    "train/22",
+    "train/23"
+  ],
+  "quant": {
+    "ew8": [
+      -9,
+      -9,
+      -9
+    ],
+    "ew1": -9,
+    "ew2": -9,
+    "ewfc": -9,
+    "ea1": -9,
+    "ea2": -11
+  },
+  "parent_checkpoint_sha256": "c34bf72b0c4f451055a0f4614b4e6b43a0c0e3cef9e876026a5bb66a8ad077c7",
+  "checkpoint_sha256": "508108b7e415c5eaa6c011634508ff7489708cc3ba78dd08f8ba9dc34fade83f",
+  "integer_crosscheck": {
+    "status": "PASS_QAT_INTEGER_BACKENDS",
+    "n": 6,
+    "maps": [
+      "pool1",
+      "pool2",
+      "four_scores",
+      "decision"
+    ]
+  },
+  "ppa_status": "NOT_MEASURED"
+}

@@ -1,0 +1,4 @@
+SYNTHETIC_SMOKE_ONLY
+24 samples/split, 2 FP32 + 2 INT8 + 2 V25-H epochs.
+These are plumbing checks, not BBB/ED accuracy or PPA claims.
+Generated RTL is an inspection/reproduction example; actual DASH RTL is regenerated from your trained export.

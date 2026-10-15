@@ -1,0 +1,50 @@
+{
+  "mode": "int8",
+  "channels": [
+    1,
+    2,
+    3
+  ],
+  "fc": [
+    48,
+    4
+  ],
+  "classes": 4,
+  "class_names": [
+    "excellent",
+    "great",
+    "good",
+    "poor"
+  ],
+  "weight_bits": [
+    8,
+    8,
+    8
+  ],
+  "activation_bits": [
+    8,
+    8
+  ],
+  "coding": {
+    "conv": "exact",
+    "fc": "exact"
+  },
+  "s1": 8,
+  "s2": 7,
+  "rounding": "nearest_even",
+  "activation": "ReLU then saturate U8",
+  "inverse": "floor per 3x3/3x2/2x3/2x2 block, then sum input channels",
+  "flatten": "CHW",
+  "source_commit": "0d345f1bb658d5772868c7ef939ac592b7a2bb19",
+  "adaptation": "DASH train-only scales, 32-bit bias/score; not legacy MNIST wrap/slice arithmetic",
+  "provenance": {
+    "dataset_identity": {
+      "train": "2bdc4e4e4809cbb50346ea0cfbee523eff20784b4e6a7de537492206f56255ec",
+      "validation": "f94909a76d3210018d970201d5725cb18417b41d5bab3a6caba5d98747f4681f"
+    },
+    "checkpoint_sha256": "508108b7e415c5eaa6c011634508ff7489708cc3ba78dd08f8ba9dc34fade83f",
+    "seed": 2026,
+    "selected_epoch": 0,
+    "synthetic_smoke": true
+  }
+}

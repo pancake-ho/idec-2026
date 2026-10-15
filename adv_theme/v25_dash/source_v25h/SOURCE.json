@@ -1,0 +1,12 @@
+{
+  "repository": "pancake-ho/idec-2026",
+  "branch": "exp/dash-train",
+  "commit": "0d345f1bb658d5772868c7ef939ac592b7a2bb19",
+  "files": {
+    "explore_v25.py": "d248ead815ebf6887789ca49b5101549eaee1c114a267b99cbd83d5c403af8f4",
+    "pfdw_pipe49_shift_engine_v25h.sv": "dccab54e3a3a31fdeab0090aa40babe6fae16ab71ff14fa9da3ca373dc25f2bc",
+    "v25h_manifest.json": "f1bcc71d416da5d3b7953a49e96e5d788f4d56a935709b18fb4a471c68cf55bc",
+    "chip_pfdw_fc_v25h.sv": "38637e4be8ee8f786aad3d76a889d8dae8e3dbba0448acb1496146b26032616e"
+  },
+  "note": "Frozen source for attribution/parity; original MNIST weights and arithmetic are not DASH trained weights."
+}
